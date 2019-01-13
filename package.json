@@ -1,0 +1,24 @@
+{
+  "name": "crossbreedapi",
+  "version": "1.0.0",
+  "description": "Backend for crossbreed",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimkablitz/crossbreed-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimkablitz/crossbreed-backend/issues"
+  },
+  "homepage": "https://github.com/kimkablitz/crossbreed-backend#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mongoose": "^5.4.3"
+  }
+}

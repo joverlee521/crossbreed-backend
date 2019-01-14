@@ -7,6 +7,9 @@ module.exports = {
   //Create
   create: function (req, res) {
     //TO-DO
+    //Note: there are two valid ways to create a pet:
+    //1) from passing in two parents (in which case we look up their dna and breed them)
+    //2) passing in a request to create a 'starter' (in which case we use 'getStarterPet')
   },
   //Find (one)
   findOne: function (req, res) {

@@ -72,7 +72,7 @@ const starterPets = [
         dna: {}, //NOTE: dna will go here soon
     },
     {
-        name: "Yellow",
+        name: "Magenta",
         baseImage: "testPet.svg",
         baseColor: {
             red: 255,
@@ -87,8 +87,8 @@ const starterPets = [
             transparency: 1
         },
         gameColor: {
-            primary: "Yellow",
-            secondary: "Yellow"
+            primary: "magenta",
+            secondary: "magenta"
         },
         isFavorite: false,
         parents: [],
@@ -110,15 +110,15 @@ const starterPets = [
             transparency: 1
         },
         gameColor: {
-            primary: "Cyan",
-            secondary: "Cyan"
+            primary: "cyan",
+            secondary: "cyan"
         },
         isFavorite: false,
         parents: [],
         dna: {}, //NOTE: dna will go here soon
     },
     {
-        name: "Magenta",
+        name: "Yellow",
         baseImage: "testPet.svg",
         baseColor: {
             red: 255,
@@ -133,8 +133,8 @@ const starterPets = [
             transparency: 1
         },
         gameColor: {
-            primary: "Magenta",
-            secondary: "Magenta"
+            primary: "yellow",
+            secondary: "yellow"
         },
         isFavorite: false,
         parents: [],
@@ -150,9 +150,9 @@ const starterPets = [
             transparency: 1 
         },
         outlineColor: {
-            red: 255,
-            blue: 255,
-            green: 255,
+            red: 0,
+            blue: 0,
+            green: 0,
             transparency: 1
         },
         gameColor: {

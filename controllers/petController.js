@@ -8,11 +8,6 @@ module.exports = {
   create: function (req, res) {
     //TO-DO
   },
-  //TEST
-  getStarter: function(req, res) {
-    const randomStarterPet = getStarterPet();
-    res.json(randomStarterPet);
-  },
   //Find (one)
   findOne: function (req, res) {
     //TO-DO

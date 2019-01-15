@@ -10,6 +10,11 @@ module.exports = {
     //Note: there are two valid ways to create a pet:
     //1) from passing in two parents (in which case we look up their dna and breed them)
     //2) passing in a request to create a 'starter' (in which case we use 'getStarterPet')
+    //RIGHT NOW: only creating name
+    db.Pet.create(req.body)
+      .then(result => res.json(result))
+      .catch(err => res.json({ error: err.message }));
+
   },
   //Find (one)
   findOne: function (req, res) {
@@ -24,11 +29,14 @@ module.exports = {
     res.json({ success: true, queryWas: "findAll" });
   },
   // Delete one
+  //(TO-DO): check that the user has the permission to delete the pet
   delete: function (req, res) {
-    //TO-DO
+    db.Pet.deleteOne({_id: req.body._id})
+      .then(result => res.json(result))
+      .catch(err => res.sendStatus(500));
   },
   // Update the specified headline
   update: function (req, res) {
-    //TO-DO
+
   }
 };

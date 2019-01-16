@@ -39,6 +39,7 @@ The following document lists out things that we know must be true about pets.
 ### Updates (PUT)
 Updating Pet Name:
 * When updating the pet name with a valid string ("Mister Bigglesworth"), receive a success
+* Pet name should be trimmed - no preceeding or trailing spaces
 * Pet name update fails if the new name contains special characters ("JoJo!")
 * Pet name update fails if the new name is 51+ characters ("AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxy")
 * Update fails if no user ID is provided (user is not logged in)

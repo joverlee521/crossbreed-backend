@@ -3,9 +3,14 @@ var petsController = require("../../controllers/petController");
 
 //ADD YOUR ROUTES HERE
 //EX:
-router.post("/", petsController.create);
+//RESTful routes for /api/pets
+//We can create a new pet (by breeding) OR get all pets a user currently has
 router.get("/", petsController.findAll);
-router.delete("/", petsController.delete);
+router.post("/", petsController.createPetFromBreeding);  
+
+//RESTful routes for ONE pet
 router.get("/:id", petsController.findOne);
+router.put("/:id", petsController.update);
+router.delete("/:id", petsController.delete);
 
 module.exports = router;

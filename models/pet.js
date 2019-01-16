@@ -21,12 +21,12 @@ var PetSchema = new Schema({
         trim: true,
         minlength: [1, "Pet must have a name"],
         maxlength: [50, "Max length is fifty characters"],
-        required: [true, "Pet must have a name"]
+        required: [true, "Pet must have a name"],
+        default: "Unnamed Pet"
     },
-    baseImage: {
-        type: String,
-        trim: true,
-        required: [true, "Pet must have an image template"],
+    lastBred: {
+        type: Date,
+        default: ""
     },
     isFavorite: {
         type: Boolean,

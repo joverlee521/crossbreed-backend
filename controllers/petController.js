@@ -29,7 +29,10 @@ module.exports = {
    
     //save it to the db 
     db.Pet.create(dataToSave)
-    .then(result => res.json(result))
+    .then(result => {
+      //NOTE: since we don't serve the dna to the front end, we'll delete that from the result object
+      result.dna = "";
+      res.json(result)})
     .catch(err => res.json(err)); 
   },
   //Find (one)
@@ -37,7 +40,7 @@ module.exports = {
   //(TO-DO) ensure that the user _id of the logged-in user also matches
   findOne: function (req, res) {
     const petId = (req.params.id || req.body.id);  //NOTE: we may not need this depending on how axios works
-    db.Pet.findOne({ _id: petId }, { dna: 0 }) //return everything except the dna
+    db.Pet.findOne({ _id: petId }, { dna: 0 } ) //return everything except the dna
       .then(result => res.json(result))
       .catch(err => res.json(err));
   },

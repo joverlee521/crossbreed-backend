@@ -1,17 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const logger = require("morgan");
 const app = express();
 const PORT = process.env.PORT || 5000;
-const bodyParser = require('body-parser');
-const routes = require("./routes/api")(app);
+const routes = require("./routes");
 
-app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(express.static("public"));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.static("public"));
 app.use(routes);
 
 

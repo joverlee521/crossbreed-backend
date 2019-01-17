@@ -9,7 +9,8 @@ var Schema = mongoose.Schema;
 
 // Create the UserSchema with our schema class
 var UserSchema = new Schema({
-//(TO-DO)
+    //(TO-DO)
+    
 });
 
 // Create the User model using the UserSchema

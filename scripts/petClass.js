@@ -162,6 +162,8 @@ class Pet {
         const whichGene = Math.floor(Math.random() * Math.floor(2));
         return (whichGene ? gene[0] : gene[1]);
     }
+
 }
 
 module.exports = Pet; 
+

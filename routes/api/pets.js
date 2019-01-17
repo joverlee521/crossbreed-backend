@@ -1,5 +1,5 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
 const petsController = require("../../controllers/petController");
 
 //ADD YOUR ROUTES HERE
@@ -12,6 +12,7 @@ router.post("/", petsController.createPetFromBreeding);
 //RESTful routes for ONE pet
 router.get("/:id", petsController.findOne);
 router.put("/:id", petsController.update);
+router.put("/level/:id", petsController.updateLevel);
 router.delete("/:id", petsController.delete);
 
 module.exports = router;

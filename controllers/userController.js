@@ -1,15 +1,26 @@
 // Controller
 // ============================
-var db = require("../models");
+const User  = require('../models/user');
 
 module.exports = {
   //Create
   create: function(req, res) {
-      //TO-DO
+     //TEST CODE
+     User.create(req.body)
+     .then(result => res.json(result))
+     .catch(err => res.json(err));
+  },
+  //Find all 
+  //TEST PURPOSES
+  findAll: function(req, res) {
+     User.find()
+     .then(results => res.json(results))
+     .catch(err=> res.json(err));
   },
   //Find (one)
   findOne: function(req, res) {
     //TO-Do
+    res.json({user: true, id: req.params.id});
   },
   // Delete one
   delete: function(req, res) {

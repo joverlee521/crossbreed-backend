@@ -21,58 +21,29 @@ const petSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  //Note: 'lastBred' stores the timestamp of the most recent successful breeding
+  //We can use that date to determine when the creature is ready to breed again
   lastBred: {
-    type: Date,
-    required: true,
-    default: Date.now
+    type: Date, 
+    default: ""
   },
   isFavorite: {
     type: Boolean,
     default: false
+  },
+  level: {
+    type: Number,
+    default: 1
+  },
+  experiencePoints: {
+    type: Number,
+    default: 0
   },
   baseColor: {},
   outlineColor: {},
   gameColor: {},
   parents: [{ type: mongoose.Schema.Types.ObjectId }],
   dna: {}
-=======
-// Require mongoose
-var mongoose = require("mongoose");
-
-// Create a schema class using mongoose's schema method
-var Schema = mongoose.Schema;
-
-// Create the PetSchema with our schema class
-var PetSchema = new Schema({
-    name: {
-        type: String,
-        validate: {
-            validator: function(val) {
-                const valid = /[^a-zA-Z0-9 ]/g;
-                return !valid.test(val);
-            },
-            message: "Pet name can only include alphanumeric and space characters"
-        },
-        trim: true,
-        minlength: [1, "Pet must have a name"],
-        maxlength: [50, "Max length is fifty characters"],
-        required: [true, "Pet must have a name"],
-        default: "Unnamed Pet"
-    },
-    lastBred: {
-        type: Date,
-        default: ""
-    },
-    isFavorite: {
-        type: Boolean,
-        default: false
-    }, 
-    baseColor: {}, 
-    outlineColor: {},
-    gameColor: {},
-    parents: [{ type: Schema.Types.ObjectId }], 
-    dna: {}
-
 });
 
 const Pet = mongoose.model("Pet", petSchema);

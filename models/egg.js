@@ -2,13 +2,10 @@
 // ==============
 
 // Require mongoose
-var mongoose = require("mongoose");
-
-// Create a schema class using mongoose's schema method
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
 // Create the EggSchema with our schema class
-var EggSchema = new Schema({
+var EggSchema = new mongoose.Schema({
 //(TO-DO)
 });
 

@@ -1,5 +1,5 @@
-var router = require("express").Router();
-var usersController = require("../../controllers/userController");
+const router = require("express").Router();
+const usersController = require("../../controllers/userController");
 
 //ADD YOUR ROUTES HERE
 //EXAMPLE:

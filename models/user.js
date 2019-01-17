@@ -2,18 +2,34 @@
 // ==============
 
 // Require mongoose
-var mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-// Create a schema class using mongoose's schema method
-var Schema = mongoose.Schema;
-
-// Create the UserSchema with our schema class
-var UserSchema = new Schema({
-//(TO-DO)
+// Create the UserSchema 
+const userSchema = new mongoose.Schema({
+  email: {
+      type: String,
+      unique:true
+  },
+  name: {
+    type: String,
+    required: false,
+    minLength: 2
+  },
+  profileURL: {
+    type: String,
+    required: false
+  },
+  device: {
+    type: String
+  },
+  pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }]
 });
 
 // Create the User model using the UserSchema
-var User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', userSchema);
+
+//exports.User =  User;
+//exports.userSchema = userSchema;
 
 // Export the User model
 module.exports = User;

@@ -2,13 +2,10 @@
 // ==============
 
 // Require mongoose
-var mongoose = require("mongoose");
-
-// Create a schema class using mongoose's schema method
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
 // Create the PetSchema with our schema class
-var PetSchema = new Schema({
+const PetSchema = new mongoose.Schema({
     name: {
         type: String,
         validate: {
@@ -40,7 +37,7 @@ var PetSchema = new Schema({
 });
 
 // Create the Pet model using the PetSchema
-var Pet = mongoose.model("Pet", PetSchema);
+const Pet = mongoose.model("Pet", PetSchema);
 
 // Export the Pet model
 module.exports = Pet;

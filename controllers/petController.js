@@ -1,8 +1,7 @@
-// Controller
-// ============================
 const db = require("../models");
 const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/petClass");
+const asyncMiddleware = require("../routes/middleware/async");
 
 
 //Main controllers
@@ -26,7 +25,7 @@ module.exports = {
   createStarterPet: function(req, res) {
     //grab a random starter pet from the templates and deconstruct the bits we need
     const dataToSave = getStarterPet().toObj();
-   
+    dataToSave.
     //save it to the db 
     db.Pet.create(dataToSave)
     .then(result => {

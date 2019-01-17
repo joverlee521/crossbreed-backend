@@ -1,6 +1,7 @@
 // Controller
 // ============================
-var db = require("../models");
+const db = require("../models");
+const asyncMiddleware = require("../routes/middleware/async");
 
 module.exports = {
   //Create

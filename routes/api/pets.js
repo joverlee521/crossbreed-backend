@@ -1,5 +1,6 @@
-var router = require("express").Router();
-var petsController = require("../../controllers/petController");
+const express = require('express');
+const router = express.Router();
+const petsController = require("../../controllers/petController");
 
 //ADD YOUR ROUTES HERE
 //EX:

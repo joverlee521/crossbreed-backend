@@ -1,8 +1,14 @@
-var router = require("express").Router();
-var usersController = require("../../controllers/userController");
+const express = require('express')
+const router = express.Router()
+const { User } = require('../../models/User');
+const asyncMiddleware = require('../middleware/async');
 
-//ADD YOUR ROUTES HERE
-//EXAMPLE:
-router.post("/", usersController.create);
- 
+router.get('/', asyncMiddleware(async (_, res) => {
+  const users = await User.find();
+  res.send({
+    success: true,
+    users,
+  });
+}));
+
 module.exports = router;

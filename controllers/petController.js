@@ -1,5 +1,3 @@
-// Controller
-// ============================
 const db = require("../models");
 const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/petClass");

@@ -25,7 +25,19 @@ class Pet {
         this.isFavorite = false;
         this.parents = ( mom.hasOwnProperty("_id") ? ((dad.hasOwnProperty("_id") ? [mom._id, dad._id] : [mom._id]) ) : "");
         this.name = "Unnamed Pet";
-        this.baseImage = "testPet.svg"; //long term this may also be controlled by genes
+        this.lastBred = "";
+    }
+    //Function to return a db object
+    toObj() {
+        return {
+            baseColor: this.baseColor,
+            outlineColor: this.outlineColor,
+            gameColor: this.gameColor,
+            isFavorite: this.isFavorite,
+            name: this.name,
+            lastBred: this.lastBred,
+            dna: this.dna
+        }
     }
 
     breed(mom, dad) {
@@ -114,11 +126,11 @@ class Pet {
                 break;
             case 'b': result = { primary: "blue", secondary: "blue" };
                 break;
-            case 'rg': result = { primary: "yellow", secondary: "yellow" };
+            case 'rg': result = { primary: "green", secondary: "red" };
                 break;
-            case 'gb': result = { primary: "cyan", secondary: "cyan" };
+            case 'gb': result = { primary: "blue", secondary: "green" };
                 break;
-            case 'rb': result = { primary: "magenta", secondary: "magenta" };
+            case 'rb': result = { primary: "red", secondary: "blue" };
                 break;
             case 'rgb': result = { primary: "white", secondary: "white" };
                 break;
@@ -150,6 +162,8 @@ class Pet {
         const whichGene = Math.floor(Math.random() * Math.floor(2));
         return (whichGene ? gene[0] : gene[1]);
     }
+
 }
 
 module.exports = Pet; 
+

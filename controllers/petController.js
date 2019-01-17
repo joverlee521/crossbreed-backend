@@ -2,6 +2,7 @@ const db = require("../models");
 const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/petClass");
 const asyncMiddleware = require("../routes/middleware/async");
+const calcLevelAndXP = require("../scripts/levelSystem");
 
 
 //Main controllers
@@ -25,7 +26,7 @@ module.exports = {
   createStarterPet: function(req, res) {
     //grab a random starter pet from the templates and deconstruct the bits we need
     const dataToSave = getStarterPet().toObj();
-    dataToSave.
+    //dataToSave.
     //save it to the db 
     db.Pet.create(dataToSave)
     .then(result => {
@@ -80,6 +81,27 @@ module.exports = {
 
     //finally, try to perform the update
     db.Pet.updateOne({ _id: req.params.id }, options)
+      .then(result => res.json(result))
+      .catch(err => res.json(err));
+  },
+
+  // Updates a specific pet's level and experience points
+  updateLevel: function (req, res) {
+    // Check that we have all the necessary variables to calculate the new level and XP, if not reject immediately
+    if (!req.body.hasOwnProperty('currentLevel') || !req.body.hasOwnProperty('currentXP') || !req.body.hasOwnProperty('gainedXP')){
+      return res.sendStatus(500);
+    }
+    // Pass variables through calculation function and return results as update arg
+    const update = { $set: {} };
+    const currentLevel = parseInt(req.body.currentLevel);
+    const currentXP = parseInt(req.body.currentXP);
+    const gainedXP = parseInt(req.body.gainedXP);
+    const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
+    update.$set["level"] = newLevel;
+    update.$set["experiencePoints"] = newXP;
+    
+    // Update pet and return the new pet stats
+    db.Pet.findByIdAndUpdate( req.params.id, update, { new: true, select: "level experiencePoints" } )
       .then(result => res.json(result))
       .catch(err => res.json(err));
   }

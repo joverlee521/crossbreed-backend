@@ -1,5 +1,5 @@
 module.exports = {
-    Pet: require("./Pet.js"),
-    User: require("./User.js"),
-    Egg: require("./Egg.js")    
+    Pet: require("./pet"),
+    User: require("./user"),
+    Egg: require("./egg")    
 };

@@ -31,6 +31,14 @@ const petSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  level: {
+    type: Number,
+    default: 1
+  },
+  experiencePoints: {
+    type: Number,
+    default: 0
+  },
   baseColor: {},
   outlineColor: {},
   gameColor: {},

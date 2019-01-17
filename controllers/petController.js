@@ -1,6 +1,9 @@
 const db = require("../models");
 const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/petClass");
+const asyncMiddleware = require("../routes/middleware/async");
+const calcLevelAndXP = require("../scripts/levelSystem");
+
 
 //Main controllers
 module.exports = {
@@ -12,17 +15,15 @@ module.exports = {
   createPetFromBreeding: function (req, res) {
     //EXPECTS an object with two keys, firstParent and secondParent
     //Values should be obj ids for the parents
-    //(TO-DO) check that a valid user id was passed
-
     //(TO-DO) grab both parents and check that both are currently able to breed
-
-    //If both parents can breed, do so, then save the child  
+    //If both parents can breed, do so, update their 'lastBred' timestamp, then save the new child to the db 
   },
 
   //REQUIRES that we pass in the id of the user whom the pet will belong to in the body of the request
   createStarterPet: function (req, res) {
     //grab a random starter pet from the templates and deconstruct the bits we need
     const dataToSave = getStarterPet().toObj();
+    console.log(req.params.userId);
     dataToSave['user'] = req.params.userId;
     //save it to the db 
     db.Pet.create(dataToSave)
@@ -33,56 +34,63 @@ module.exports = {
       })
       .catch(err => res.json(err));
   },
-  //Find (one)
-  //Find
-  //(TO-DO) ensure that the user _id of the logged-in user also matches
-  findOne: function (req, res) {
-    const petId = req.params.petId;
-    db.Pet.findOne({ _id: petId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
-  },
-  //Looks up a particular pet and ensures it also belongs to that user
-  findOneByUser: function (req, res) {
-    const petId = req.params.id;
-
-    db.Pet.findOne({ _id: petId }, { dna: 0 }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
-  },
-
-  //TEST ROUTE: exposes all pets in the db
-  findAll: function (req, res) {
+   //TEST ROUTE: exposes all pets in the db
+   findAll: function (req, res) {
     db.Pet.find({}, { dna: 0 })   //return everything except the dna
       .then(results => res.json(results))
       .catch(err => res.json(err));
   },
-
-  //Find all pets (for a particular user)
-  //NOTE: the DNA field is NEVER returned to the front end
-  //(TO-DO) limit the pets returned to only the ones that belong to a particular user!
-  findAllPetsForUser: function (req, res) {
-    db.Pet.find({ user: req.params.userId }, { dna: 0 })
-      .then(results => res.json(results))
+  //TEST ROUTE:
+  //Find one pet (regardless of the user who owns it)
+  findOne: function (req, res) {
+    db.Pet.findOne({ _id: req.params.petId }, { dna: 0 }) //return everything except the dna
+      .then(result => res.json(result))
       .catch(err => res.json(err));
   },
-  // Delete one
-  delete: function (req, res) {
-    db.Pet.deleteOne({ _id: req.params.petId, userid: req.params.userId })
+  //Find one pet (that belongs to a user)
+  //Looks up a particular pet and ensures it also belongs to that user
+  findOneByUser: function (req, res) {
+    db.Pet.findOne({ _id: req.params.petId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
       .then(result => res.json(result))
       .catch(err => res.json(err));
   },
 
-  // Update the specified pet - currently we ONLY allow users to update the pet's name and isFavorite on their own
-  //(TO-DO) ensure that the user _id of the logged-in user also matches
+  //Find all pets (for a particular user)
+  findAllPetsByUser: function (req, res) {
+    db.Pet.find({ user: req.params.userId }, { dna: 0 })
+      .then(results => res.json(results))
+      .catch(err => res.json(err));
+  },
+
+  // Delete one pet (belonging to a particular user)
+  delete: function (req, res) {
+    db.Pet.deleteOne({ _id: req.params.petId, user: req.params.userId })
+      .then(result => res.json(result))
+      .catch(err => res.json(err));
+  },
+
+  // Update the specified pet (belonging to a particular user)
   update: function (req, res) {
-    //Check what we passed in -- if we didn't set at least one of the two possible options, reject immediately
-    if (!req.body.hasOwnProperty('isFavorite') && !req.body.hasOwnProperty('name')) {
+    //Check what we passed in -- if we didn't set at least one of the possible options, reject immediately
+    //(TO-DO) refactor how we check for problems -- array of fields to check?
+    //(TO-DO) what happens if we get one of the necessary items for Jover's leveling mechanic but not all three?  Etc
+    if (!req.body.hasOwnProperty('isFavorite') && !req.body.hasOwnProperty('name') && !req.body.hasOwnProperty('currentLevel') && !req.body.hasOwnProperty('currentXP') && !req.body.hasOwnProperty('gainedXP')) {
       return res.sendStatus(500);
     }
 
-    //now we populate our options based on what we received in the req.body
+    //Now we populate our options based on what we received in the req.body
     const options = { $set: {} };
+
+    // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
+    if (req.body.hasOwnProperty('currentLevel') && req.body.hasOwnProperty('currentXP') && req.body.hasOwnProperty('gainedXP')) {
+      // Pass variables through calculation function and return results as update arg
+      const currentLevel = parseInt(req.body.currentLevel);
+      const currentXP = parseInt(req.body.currentXP);
+      const gainedXP = parseInt(req.body.gainedXP);
+      const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
+      options.$set["level"] = newLevel;
+      options.$set["experiencePoints"] = newXP;
+    }
 
     if (req.body.hasOwnProperty('isFavorite')) {
       options.$set["isFavorite"] = req.body.isFavorite;
@@ -92,8 +100,8 @@ module.exports = {
       options.$set["name"] = req.body.name;
     }
 
-    //finally, try to perform the update
-    db.Pet.updateOne({ _id: req.params.petId }, options)
+    // Update pet and return the new pet stats
+    db.Pet.findOneAndUpdate({ _id: req.params.petId, user: req.params.userId }, options, { new: true, fields: {dna: 0} })
       .then(result => res.json(result))
       .catch(err => res.json(err));
   }

@@ -26,6 +26,8 @@ class Pet {
         this.parents = ( mom.hasOwnProperty("_id") ? ((dad.hasOwnProperty("_id") ? [mom._id, dad._id] : [mom._id]) ) : "");
         this.name = "Unnamed Pet";
         this.lastBred = "";
+        this.level = 1;
+        this.experiencePoints = 0;
     }
     //Function to return a db object
     toObj() {

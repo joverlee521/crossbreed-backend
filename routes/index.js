@@ -3,7 +3,7 @@ const apiRoutes = require("./api");
 
 router.use("/api", apiRoutes);
 //healthcheck route
-router.get("/", (req, res) => {
+router.get("/test", (req, res) => {
     res.status(200).send({
         success: true,
         message: "this is a test route"

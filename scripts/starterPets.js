@@ -1,7 +1,7 @@
 //STARTER PET TEMPLATES
 //When starting the game, users can currently receive pets from a selection of eight pre-defined 'starter' pets 
 
-const Pet = require('./petClass');
+const Pet = require('./hatchEggs.js');
 
 const starterPets = [
     {
@@ -209,7 +209,7 @@ const starterPets = [
 function getRandomStarter() {
     //return a random one of the possible starters
     const randomIndex = Math.floor(Math.random() * starterPets.length);
-    return new Pet(starterPets[randomIndex]);
+    return new Pet(starterPets[randomIndex]).toObj();
 }
 
 module.exports = getRandomStarter;

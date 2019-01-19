@@ -27,10 +27,6 @@ const petSchema = new mongoose.Schema({
     type: Date, 
     default: ""
   },
-  isStarter: {
-    type: Boolean,
-    default: false
-  },
   isWild: {
     type: Boolean,
     default: false

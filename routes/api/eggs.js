@@ -4,6 +4,8 @@ const eggsController = require("../../controllers/eggController");
 
 //ADD YOUR ROUTES HERE
 //EX:
-router.post("/", eggsController.create);
+//Test Routes
+router.get("/", eggsController.findAll);
+router.get("/:eggId", eggsController.findOne);
  
 module.exports = router;

@@ -10,10 +10,9 @@ module.exports = {
      .then(result => res.json(result))
      .catch(err => res.json(err));
   },
-  //Find all 
-  //TEST PURPOSES
-  findAll: function(req, res) {
-     User.find()
+  //Find a user by their email
+  findUserByEmail: function(req, res) {
+     User.find({email: req.body.email})
      .then(results => res.json(results))
      .catch(err=> res.json(err));
   },
@@ -34,7 +33,7 @@ module.exports = {
   update: function(req, res) {
    //QUESTION: should they be able to update their email right now?  Without another way to authenticate, this would break
     //Check what we passed in -- if we didn't set at least one of the possible options, reject immediately
-    if (!req.body.hasOwnProperty('name') && !req.body.hasOwnProperty('device') && !req.body.hasOwnProperty('profileURL')) {
+    if (!req.body.hasOwnProperty('name') && !req.body.hasOwnProperty('device') && !req.body.hasOwnProperty('profileURL') && !req.body.hasOwnProperty('email')) {
       return res.sendStatus(500);
     }
 
@@ -53,6 +52,11 @@ module.exports = {
       options.$set['profileURL'] = req.body.profileURL;
     }
     
+    if(req.body.hasOwnProperty('email')) {
+      options.$set['email'] = req.body.email;
+    }
+    
+
     //finally, try to perform the update
     User.updateOne({ _id: req.params.userId }, options)
       .then(result => res.json(result))

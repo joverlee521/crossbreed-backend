@@ -6,8 +6,7 @@ const petsController = require("../../controllers/petController");
 
 //RESTFUL routes for all users
 router.post('/', userController.create);
-//TEST route -- right now I don't think we have need for a 'find all users' route
-router.get('/', userController.findAll);
+router.get('/', userController.findUserByEmail);
 
 //RESTFUL routes for a single user
 router.get('/:userId', userController.findOne);
@@ -21,6 +20,8 @@ router.post("/:userId/starter", petsController.createStarterPet);
 //RESTFUL routes for a user's pets
 //Show all the pets that belong to a particular user
 router.get('/:userId/pets', petsController.findAllPetsByUser);
+//Create a new pet (by breeding)
+router.post('/:userId/pets', asyncMiddleware(petsController.createPetFromBreeding));
 
 //RESTFUL routes for a single pet for the user
 router.get('/:userId/pets/:petId', petsController.findOneByUser);

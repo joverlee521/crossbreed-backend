@@ -4,7 +4,9 @@ class Pet {
     constructor(mom, dad = "") {
         if (!dad.dna) {
             this.dna = mom.dna; //parthogenesis - if no father is provided, mom clones themself
+            this.isStarter = true;
         } else {
+            this.isStarter = false;
             this.dna = this.breed(mom.dna, dad.dna);
         }
         //PHENOTYPE INTERPRETATION 
@@ -23,7 +25,10 @@ class Pet {
 
         //NON-DNA BASED ATTRIBUTES
         this.isFavorite = false;
-        this.parents = ( mom.hasOwnProperty("_id") ? ((dad.hasOwnProperty("_id") ? [mom._id, dad._id] : [mom._id]) ) : "");
+        this.isWild = false;
+        if(!this.isStarter) {
+            this.parents = [mom._id, dad._id];
+        }
         this.name = "Unnamed Pet";
         this.lastBred = "";
         this.level = 1;

@@ -16,16 +16,24 @@ const petSchema = new mongoose.Schema({
     required: [true, "Pet must have a name"],
     default: "Unnamed Pet"
   },
+  //Note: we are not requiring the user id because later on folks can 'release' pets
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+    ref: "User" 
   },
   //Note: 'lastBred' stores the timestamp of the most recent successful breeding
   //We can use that date to determine when the creature is ready to breed again
   lastBred: {
     type: Date, 
     default: ""
+  },
+  isStarter: {
+    type: Boolean,
+    default: false
+  },
+  isWild: {
+    type: Boolean,
+    default: false
   },
   isFavorite: {
     type: Boolean,

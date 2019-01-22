@@ -1,9 +1,12 @@
 const router = require("express").Router();
 const apiRoutes = require("./api");
+const authRoutes = require('./auth');
 
+router.use("/auth", authRoutes);
 router.use("/api", apiRoutes);
+
 //healthcheck route
-router.get("/test", (req, res) => {
+router.get("/", (req, res) => {
     res.status(200).send({
         success: true,
         message: "this is a test route"

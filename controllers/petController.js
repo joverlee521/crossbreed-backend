@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require("../db/models");
 const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/hatchEggs");
 const calcLevelAndXP = require("../scripts/levelSystem");

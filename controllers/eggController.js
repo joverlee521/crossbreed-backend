@@ -1,6 +1,8 @@
-// Controller
-// ============================
-const db = require("../models/");
+//(TO-DO) REFACTOR THE PET CONTROLLER TO HANDLE AUTH
+//USER MUST BE AUTHENTICATED IN ORDER TO CREATE EGGS, UPDATE EGGS, DELETE EGGS
+//(but anyone can get EGGS)
+
+const db = require("../db/models");
 const Egg = require("../scripts/createEggs");
 
 module.exports = {

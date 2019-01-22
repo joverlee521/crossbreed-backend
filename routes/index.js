@@ -6,10 +6,10 @@ router.use("/auth", authRoutes);
 router.use("/api", apiRoutes);
 
 //healthcheck route
-/* router.get("/", (req, res) => {
+router.get("/", (req, res) => {
     res.status(200).send({
         success: true,
         message: "this is a test route"
     })
-}) */
+}) 
 module.exports = router;

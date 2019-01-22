@@ -6,92 +6,125 @@ const db = require("../db/models");
 const Egg = require("../scripts/createEggs");
 
 module.exports = {
-  //Create an egg (from two parents)
-  createPetFromEgg: async function (req, res) {
-    //EXPECTS an object with two keys, firstParent and secondParent
-    //Values should be obj ids for the parents
-    //If both parents can breed, do so, update their 'lastBred' timestamp, then save the new child to the db
-
-    if (!req.body.hasOwnProperty('firstParent') && !req.body.hasOwnProperty('secondParent')) {
-      return res.sendStatus(400);
-    }
-
-    //Cannot breed the same pet to itself
-    if (req.body.firstParent === req.body.secondParent) {
-      return res.sendStatus(400);
-    }
-
-    //Cannot breed parents to pets that belong to different users
-    //(TO-DO) Add the logic that prevents an egg from being created if the parents were last bred too recently
-    let firstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: req.params.userId }, ['_id', 'dna']);
-    let secondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: req.params.userId }, ['_id', 'dna']);
-
-    //Make sure we actually got valid parents
-    if (!firstParent || !secondParent) {
-      return res.sendStatus(404);
-    }
-
-    //Finally!  We can create an egg :)
-    const newEgg = Egg.createFromParents(firstParent, secondParent);
-
-    //now we save the child to the db under this user's name 
-    //and update the parents to show they have recently bred
-    newEgg['user'] = req.params.userId;
-    
-    Promise.all([
-      db.Pet.updateOne({ _id: req.body.firstParent, user: req.params.userId }, { $set: { lastBred: Date.now() } }),
-      db.Pet.updateOne({ _id: req.body.secondParent, user: req.params.userId }, { $set: { lastBred: Date.now() } }),
-      db.Egg.create(newEgg)])
-      .then(results => res.json(results));
-  },
-  //TEST ROUTE: exposes all eggs in the db
-  findAll: function (req, res) {
-    db.Egg.find({}, { dna: 0 })   //return everything except the dna
-      .then(results => res.json(results))
-      .catch(err => res.json(err));
-  },
-  //TEST ROUTE:
-  //Find one egg (regardless of the user who owns it)
-  findOne: function (req, res) {
-    db.Egg.findOne({ _id: req.params.eggId }, { dna: 0 }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
-  },
+  //PUBLIC ACTIONS 
   findAllEggsByUser: function (req, res) {
-    db.Egg.find({ user: req.params.userId }, { dna: 0 })
-      .then(results => res.json(results))
-      .catch(err => res.json(err));
+    db.Egg.find({ user: req.params.userId }, { dna: 0 }) //return everything but the dna
+      .then(results => {
+        if(!results) {
+          return res.sendStatus(404);
+        }
+        return res.json(results)
+      })
+      .catch(err => res.sendStatus(500));
   },
   //Find one egg by user: 
   findOneByUser: function (req, res) {
     db.Egg.findOne({ _id: req.params.eggId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
+      .then(result => { 
+        if(!result) {
+          return res.sendStatus(404);
+        }
+        return res.json(result)
+      })
+      .catch(err => res.sendStatus(500));
   },
-  // Delete one
+
+  //PROTECTED ACTIONS
+  //Users must be logged in to do these actions
+  //Create an egg (from two parents)
+  createEggFromTwoParents: async function (req, res) {
+    //EXPECTS the following in the body:
+    //1) user object which has a _id for the logged in user
+    //2) keys 'firstParent' and 'secondParent', holding obj id of the two pets to breed
+    //If both parents can breed, do so, update their 'lastBred' timestamp, then save the new child to the db
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
+    //make sure we have at least two distinct parent IDs
+    if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
+      return res.sendStatus(400);
+    }
+
+    //(TO-DO) Add the logic that prevents an egg from being created if the parents were last bred too recently
+    //Note: we may be able to refactor so that it automatically updates the lastBred if indeed both parents are eligible to breed at this time?
+    const dbFirstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: loggedInUser }, ['_id', 'dna']);
+    const dbSecondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: loggedInUser }, ['_id', 'dna']);
+
+    //Make sure we actually got valid parent results
+    if (!dbFirstParent || !dbSecondParent) {
+      return res.sendStatus(404);
+    }
+
+    //Finally!  We can create an egg :)
+    const newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);
+
+    //now we save the child to the db under this user's name 
+    //and update the parents to show they have recently bred
+    newEgg['user'] = loggedInUser;
+
+    const results = await Promise.all([
+      db.Pet.updateOne({ _id: dbFirstParent._id, user: loggedInUser }, { $set: { lastBred: Date.now() } }),
+      db.Pet.updateOne({ _id: dbSecondParent._id, user: loggedInUser }, { $set: { lastBred: Date.now() } }),
+      db.Egg.create(newEgg)]);
+
+    //only send the egg back to the front end -- after removing the dna
+    const eggResult = results[2];
+    eggResult.dna = "";
+    res.json(eggResult);
+  },
+
+  // Delete an egg
   delete: function (req, res) {
-    db.Egg.deleteOne({ _id: req.params.eggId, user: req.params.userId })
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
+    db.Egg.deleteOne({ _id: req.params.eggId, user: loggedInUser })
       .then(result => res.json(result))
-      .catch(err => res.json(err));
+      .catch(err => res.sendStatus(500));
   },
   // Update the specified egg (belonging to a user)
   update: function (req, res) {
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
     //NOTE: at this time the only things we can change are the isFrozen and countdown timers
-    if (!req.body.hasOwnProperty('isFrozen')) {
+    //TO-DO add the count-down timer!
+    if (!typeof(req.body.isFrozen) === "boolean") { 
       return res.sendStatus(400);
     }
-    //TO-DO: add a check to make sure the user has stable space to be hatching this egg!
+    //TO-DO: also add a check to make sure the user has stable space to be hatching this egg!
 
     //Customize our options based on what we let the user set
     const options = { $set: {} };
 
-    if (req.body.hasOwnProperty('isFrozen')) {
+    if (req.body.isFrozen) {
       options.$set["isFrozen"] = req.body.isFrozen;
     }
 
     // Update pet and return the new egg
-    db.Egg.findOneAndUpdate({ _id: req.params.eggId, user: req.params.userId }, options, { new: true, fields: { dna: 0 } })
+    db.Egg.findOneAndUpdate({ _id: req.params.eggId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
       .then(result => res.json(result))
-      .catch(err => res.json(err));
+      .catch(err => res.sendStatus(500));
   }
 };

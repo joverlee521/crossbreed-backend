@@ -5,18 +5,16 @@ mongoose.promise = Promise
 
 // Define userSchema
 const userSchema = new Schema({
-	local: {
+  displayName: { type: String, unique: true, required: true },
+  local: { //if using username/password
 		username: { type: String, unique: true, required: false },
 		password: { type: String, unique: false, required: false }
   },
-  displayName: { type: String, unique: true, required: true },
-  google: {
-	googleId: { type: String, required: false }
+  google: { //if using google auth
+	  googleId: { type: String, required: false }
 	},
-/* 	firstName: { type: String, unique: false },
-	lastName: { type: String, unique: false },
-	photo: { type: String, required: false }, */
-	pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }]
+  pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }],
+  eggs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Egg' }],
 })
 
 // Define schema methods

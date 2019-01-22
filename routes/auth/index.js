@@ -22,13 +22,13 @@ router.post(
 	(req, res) => {
 		console.log('POST to /login')
 		const user = JSON.parse(JSON.stringify(req.user)) // hack
-		const cleanUser = Object.assign({}, user)
-		if (cleanUser.local) {
-			console.log(`Deleting ${cleanUser.local.password}`)
-			delete cleanUser.local.password
-			cleanUser.local = {};
-		}
-		console.log(cleanUser)
+		//Only return explicitly what we need to the front end
+		const cleanUser = {
+			_id: user._id,
+			displayName: user.displayName,
+/* 			pets: user.pets,
+			eggs: user.eggs */
+		};
 		res.json({ user: cleanUser })
 	}
 )

@@ -5,8 +5,7 @@ const petSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: function(val) {
-        const valid = /[^a-zA-Z0-9 ]/g;
-        return !valid.test(val);
+        return /([A-Za-z0-9\ ])\w+/.test(val);
       },
       message: "Pet name can only include alphanumeric and space characters"
     },

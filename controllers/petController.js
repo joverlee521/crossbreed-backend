@@ -3,120 +3,153 @@ const getStarterPet = require("../scripts/starterPets");
 const Pet = require("../scripts/hatchEggs");
 const calcLevelAndXP = require("../scripts/levelSystem");
 
-//Main controllers
 module.exports = {
+  //UNPROTECTED METHODS (GET)
+  //Find all pets (for a particular user)
+  findAllPetsByUser: function (req, res) {
+    db.Pet.find({ user: req.params.userId }, { dna: 0 })
+      .then(results => res.json(results))
+      .catch(err => res.sendStatus(500));
+  },
+
+  //Find one pet (that belongs to a user)
+  //Looks up a particular pet 
+  findOneByUser: function (req, res) {
+    db.Pet.findOne({ _id: req.params.petId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
+      .then(result => res.json(result))
+      .catch(err => res.sendStatus(500));
+  },
+
+  //PROTECTED METHODS
   //CREATE METHODS
-  //There are two valid ways to create a pet:
+  //Note: there are two valid ways to create a pet:
   //1) from hatching an egg
   //2) creating an adult 'starter' pet when a new user is first created
   createPetFromEgg: async function (req, res) {
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
     //Expects the _id of an egg to hatch from the body of the request
-    if(!req.body.hasOwnProperty('_id')) {
+    if (!req.body._id) {
       return res.json(400);
-    } 
+    }
+
     //First, look up the egg 
     //(TO-DO) Validate that it has incubated long enough to hatch
-    const eggData = await db.Egg.findOne({_id: req.body._id, user: req.params.userId, isFrozen: false});
-    if(!eggData) {
+    const eggData = await db.Egg.findOne({ _id: req.body._id, user: loggedInUser, isFrozen: false });
+    if (!eggData) {
       return res.sendStatus(404);
     }
 
-    //otherwise, create a new pet from the egg
+    //create a new pet from the egg (and set it to belong to the user)
     const newPet = new Pet(eggData);
+    newPet['user'] = loggedInUser;
 
-    //...and save the pet!
-    newPet['user'] = req.params.userId;
-    //save it to the db 
-    db.Pet.create(newPet)
-      .then(result => {
-        //NOTE: since we don't serve the dna to the front end, we'll delete that from the result object
-        result.dna = "";
-        res.json(result)
-      })
-      .catch(err => res.json(err));
+    //now, delete the egg...and save our hatched pet!
+    const results = await Promise.all([db.Egg.findByIdAndDelete(eggData._id), db.Pet.create(newPet)]); 
+
+    //return only the new pet (minus the dna) to the front end
+    const hatchedPet = results[1];
+    hatchedPet.dna = "";
+    res.json(hatchedPet);
   },
 
   createStarterPet: function (req, res) {
-    //grab a random starter pet from the templates and deconstruct the bits we need
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
+    //grab a random starter pet from the template and add which user it belongs to
     const dataToSave = getStarterPet();
-    dataToSave['user'] = req.params.userId;
+    dataToSave['user'] = loggedInUser;
+
     //save it to the db 
     db.Pet.create(dataToSave)
       .then(result => {
         //NOTE: since we don't serve the dna to the front end, we'll delete that from the result object
         result.dna = "";
-        res.json(result)
+        res.json(result);
       })
-      .catch(err => res.json(err));
-  },
-  //TEST ROUTE: exposes all pets in the db
-  findAll: function (req, res) {
-    db.Pet.find({})   //return everything except the dna
-      .then(results => res.json(results))
-      .catch(err => res.json(err));
-  },
-  //TEST ROUTE:
-  //Find one pet (regardless of the user who owns it)
-  findOne: function (req, res) {
-    db.Pet.findOne({ _id: req.params.petId }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
-  },
-  //Find one pet (that belongs to a user)
-  //Looks up a particular pet and ensures it also belongs to that user
-  findOneByUser: function (req, res) {
-    db.Pet.findOne({ _id: req.params.petId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
-      .then(result => res.json(result))
-      .catch(err => res.json(err));
-  },
-
-  //Find all pets (for a particular user)
-  findAllPetsByUser: function (req, res) {
-    db.Pet.find({ user: req.params.userId }, { dna: 0 })
-      .then(results => res.json(results))
       .catch(err => res.json(err));
   },
 
   // Delete one pet (belonging to a particular user)
   delete: function (req, res) {
-    db.Pet.deleteOne({ _id: req.params.petId, user: req.params.userId })
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
+    db.Pet.deleteOne({ _id: req.params.petId, user: loggedInUser })
       .then(result => res.json(result))
       .catch(err => res.json(err));
   },
 
   // Update the specified pet (belonging to a particular user)
+  // Valid attributes to update at present are isFavorite, pet name, and level/xp/gainedxp
   update: function (req, res) {
-    //Check what we passed in -- if we didn't set at least one of the possible options, reject immediately
-    //(TO-DO) refactor how we check for problems -- array of fields to check?
-    //(TO-DO) what happens if we get one of the necessary items for Jover's leveling mechanic but not all three?  Etc
-    if (!req.body.hasOwnProperty('isFavorite') && !req.body.hasOwnProperty('name') && !req.body.hasOwnProperty('currentLevel') && !req.body.hasOwnProperty('currentXP') && !req.body.hasOwnProperty('gainedXP')) {
-      return res.sendStatus(500);
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    //sanity check if the id doesn't match the route, also reject with forbidden
+    if (loggedInUser !== req.params.userId) {
+      return res.sendStatus(403);
+    }
+
+    //Check what we passed in -- if we didn't set at least one of the possible options, reject as malformed
+    if (!req.body.isFavorite && !req.body.name && !req.body.currentLevel && !req.body.currentXP && !req.body.gainedXP) {
+      return res.sendStatus(400);
     }
 
     //Now we populate our options based on what we received in the req.body
     const options = { $set: {} };
 
     // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-    if (req.body.hasOwnProperty('currentLevel') && req.body.hasOwnProperty('currentXP') && req.body.hasOwnProperty('gainedXP')) {
-      // Pass variables through calculation function and return results as update arg
+    if (req.body.currentLevel && req.body.currentXP && req.body.gainedXP) {
       const currentLevel = parseInt(req.body.currentLevel);
       const currentXP = parseInt(req.body.currentXP);
       const gainedXP = parseInt(req.body.gainedXP);
+      //if you send garbage in for the level data, reject as a malformed request
+      if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
+        return res.sendStatus(400);
+      }
+      //otherwise calculate the level
+      // Pass variables through calculation function and return results as update arg
       const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
       options.$set["level"] = newLevel;
       options.$set["experiencePoints"] = newXP;
     }
 
-    if (req.body.hasOwnProperty('isFavorite')) {
+    if (req.body.isFavorite) {
       options.$set["isFavorite"] = req.body.isFavorite;
     }
 
-    if (req.body.hasOwnProperty('name')) {
+    if (req.body.name) {
       options.$set["name"] = req.body.name;
     }
 
-    // Update pet and return the new pet stats
-    db.Pet.findOneAndUpdate({ _id: req.params.petId, user: req.params.userId }, options, { new: true, fields: { dna: 0 } })
+    // Update pet and return the new pet stats (if anything did update successfully)
+    db.Pet.findOneAndUpdate({ _id: req.params.petId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
       .then(result => res.json(result))
       .catch(err => res.json(err));
   }

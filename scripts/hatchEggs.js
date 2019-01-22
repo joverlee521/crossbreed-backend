@@ -1,57 +1,34 @@
+//HATCH PETS FROM EGGS
+//Takes in an egg (which contains dna) and then interprets the phenotype of the pet from the dna contained :)
 class Pet {
-    //The pet constructor takes in one or two parents and produces their offspring
-    //NOTE: if passed only one parent, the offspring will be a genetic clone of that parent (parthogenesis)
-    constructor(mom, dad = "") {
-        if (!dad.dna) {
-            this.dna = mom.dna; //parthogenesis - if no father is provided, mom clones themself
-        } else {
-            this.dna = this.breed(mom.dna, dad.dna);
-        }
+    //The pet constructor takes in an egg and interprets its dna into a real pet!
+    constructor(egg) {
+        //(TO-DO) add better validation with Joi
+        this.dna = egg.dna;
+        this.parents = egg.parents;
         //PHENOTYPE INTERPRETATION 
-        //we now use our newly created dna to determine other things!
 
         //BASE COLOR
         //set rgb color values for the base body of the creature
         this.baseColor = this.determineColor("baseColor");
 
         //OUTLINE COLOR (contrast color)
-        this.outlineColor = this.determineOutlineColor(this.baseColor); //long-term this could also be gene-controlled 
+        //long-term this could also be gene-controlled 
+        this.outlineColor = this.determineOutlineColor(this.baseColor); 
 
         //GAME COLOR
         //Interpret which color(s) the creature should 'count as' in the game
         this.gameColor = this.determineGameColor(this.baseColor);
-
-        //NON-DNA BASED ATTRIBUTES
-        this.isFavorite = false;
-        this.parents = ( mom.hasOwnProperty("_id") ? ((dad.hasOwnProperty("_id") ? [mom._id, dad._id] : [mom._id]) ) : "");
-        this.name = "Unnamed Pet";
-        this.lastBred = "";
-        this.level = 1;
-        this.experiencePoints = 0;
     }
-    //Function to return a db object
+
     toObj() {
         return {
+            dna: this.dna,
+            parents: this.parents,
             baseColor: this.baseColor,
             outlineColor: this.outlineColor,
-            gameColor: this.gameColor,
-            isFavorite: this.isFavorite,
-            name: this.name,
-            lastBred: this.lastBred,
-            dna: this.dna
-        }
-    }
-
-    breed(mom, dad) {
-        const childsDNA = {};
-        for (let key in mom) {
-            if (mom.hasOwnProperty(key) && dad.hasOwnProperty(key)) {
-                childsDNA[key] = []; //start an empty array for the child's dna
-                childsDNA[key].push(this.getRandomAllele(mom[key])); //add a random allele from both mom & dad!
-                childsDNA[key].push(this.getRandomAllele(dad[key]));
-            }
-        }
-        return childsDNA; //and return the child
+            gameColor: this.gameColor
+        };
     }
 
     determineColor(geneGroup) {

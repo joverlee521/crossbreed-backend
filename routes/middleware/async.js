@@ -3,7 +3,8 @@ module.exports = function asyncMiddleware(handler) {
       try {
         await handler(req, res);
       } catch (ex) {
-        next(ex);
+        res.send({err: ex.message});
+        //res.sendStatus(400); //next(ex);
       }
     };
   };

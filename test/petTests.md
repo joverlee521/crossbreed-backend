@@ -3,7 +3,7 @@ The following document lists out things that we know must be true about pets.
 
 ## Pet Objects
 *Name*: Pets may have an alphanumeric string w/spaces. Length: 50 characters. No special characters. Pet name can be "", in which case it should display as 'Unnamed Pet' on the front end.
-*Base Image*: String, path to the svg that contains the pet's basic image.
+*isWild*: Boolean, indicating if the pet is wild or not
 *Base Color*: Object, containing four keys - red, green, blue, transparency. RGB are integers 0-255; transparency is decimal 0-1
 *Outline Color*: Object, containing four keys - red, green, blue, transparency. RGB are integers 0-255; transparency is decimal 0-1
 *Game color*: Object, containing two keys - primary and secondary. Values are strings, ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 'black', 'white']

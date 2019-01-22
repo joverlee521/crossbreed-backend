@@ -5,8 +5,7 @@ const petSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: function(val) {
-        const valid = /[^a-zA-Z0-9 ]/g;
-        return !valid.test(val);
+        return /([A-Za-z0-9\ ])\w+/.test(val);
       },
       message: "Pet name can only include alphanumeric and space characters"
     },
@@ -16,16 +15,20 @@ const petSchema = new mongoose.Schema({
     required: [true, "Pet must have a name"],
     default: "Unnamed Pet"
   },
+  //Note: we are not requiring the user id because later on folks can 'release' pets
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
+    ref: "User" 
   },
   //Note: 'lastBred' stores the timestamp of the most recent successful breeding
   //We can use that date to determine when the creature is ready to breed again
   lastBred: {
     type: Date, 
     default: ""
+  },
+  isWild: {
+    type: Boolean,
+    default: false
   },
   isFavorite: {
     type: Boolean,

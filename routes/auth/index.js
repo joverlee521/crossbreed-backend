@@ -73,4 +73,20 @@ router.post('/signup', (req, res) => {
 	})
 })
 
+// Route for logging in with Google on the front-end
+// Will look for googleId in the database, will create doc if it doesn't exist already
+router.post('/login/google', (req, res) => {
+	const { id, givenName } = req.body;
+	User.findOneAndUpdate({ 'google.googleId': id }, {$set: { 'displayName': givenName }}, { upsert: true, new: true }, (err, user) => {
+		if(err) return res.json(err);
+		return res.json(
+			{
+				_id: user._id,
+				displayName: user.displayName,
+				pets: user.pets
+			}
+		)
+	})
+})
+
 module.exports = router

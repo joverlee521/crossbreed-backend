@@ -10,11 +10,11 @@ const userSchema = new Schema({
 		password: { type: String, unique: false, required: false }
   },
   displayName: { type: String, unique: true, required: true },
+  google: {
+	googleId: { type: String, required: false }
+	},
 /* 	firstName: { type: String, unique: false },
 	lastName: { type: String, unique: false },
-	google: {
-		googleId: { type: String, required: false }
-	},
 	photo: { type: String, required: false }, */
 	pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }]
 })

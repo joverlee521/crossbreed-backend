@@ -26,10 +26,11 @@ module.exports = {
   //1) from hatching an egg
   //2) creating an adult 'starter' pet when a new user is first created
   createPetFromEgg: async function (req, res) {
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+    console.log("My name is: " + req.session.passport.displayName);
 
     //sanity check if the id doesn't match the route, also reject with forbidden
     if (loggedInUser !== req.params.userId) {
@@ -53,7 +54,7 @@ module.exports = {
     newPet['user'] = loggedInUser;
 
     //now, delete the egg...and save our hatched pet!
-    const results = await Promise.all([db.Egg.findByIdAndDelete(eggData._id), db.Pet.create(newPet)]); 
+    const results = await Promise.all([db.Egg.findByIdAndDelete(eggData._id), db.Pet.create(newPet)]);
 
     //return only the new pet (minus the dna) to the front end
     const hatchedPet = results[1];
@@ -61,37 +62,48 @@ module.exports = {
     res.json(hatchedPet);
   },
 
-  createStarterPet: function (req, res) {
+  createStarterPet: async function (req, res) {
     console.log("Trying to create a starter pet");
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       console.log("Not logged in");
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
     console.log("Logged in as " + loggedInUser);
 
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
-
     //grab a random starter pet from the template and add which user it belongs to
-    const dataToSave = getStarterPet();
-    dataToSave['user'] = loggedInUser;
+    const firstPet = getStarterPet();
+    firstPet['user'] = loggedInUser;
+
+    const secondPet = getStarterPet();
+    secondPet['user'] = loggedInUser;
 
     //save it to the db 
-    db.Pet.create(dataToSave)
-      .then(result => {
-        //NOTE: since we don't serve the dna to the front end, we'll delete that from the result object
-        result.dna = "";
-        res.json(result);
-      })
-      .catch(err => res.status(500).json(err));
+    const dbSavedPets = await Promise.all(
+      [db.Pet.create(firstPet), db.Pet.create(secondPet)]
+    );
+
+    //finally, continue updating the user model with the pets
+    const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
+      $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id]} }
+    }, { new: true });
+
+    firstPet.dna = ""; //hack
+    secondPet.dna = ""; //hack
+
+    res.json({
+      user: {
+        _id: updatedUserResult._id,
+        displayName: updatedUserResult.displayName,
+        pets: [firstPet, secondPet],
+        eggs: []
+      }
+    }); 
   },
 
   // Delete one pet (belonging to a particular user)
   delete: function (req, res) {
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
@@ -109,7 +121,7 @@ module.exports = {
   // Update the specified pet (belonging to a particular user)
   // Valid attributes to update at present are isFavorite, pet name, and level/xp/gainedxp
   update: function (req, res) {
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../db/models/user');
+const petController = require('../../controllers/petController');
 const passport = require('../../passport');
+const asyncMiddleWare = require('../middleware/async');
 
 // router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 
@@ -87,10 +89,13 @@ router.post(
 			})
 		})
 	},
-	passport.authenticate('local'),
-	(req, res) => {
+	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
+	/* (req, res) => {
 		console.log('POSTING after we first signed up and are now logged in')
 		const user = JSON.parse(JSON.stringify(req.user)) // hack
+		//create two starter pets and save to the db for that new user, then return the complete logged in user to the front end
+		
+
 		//Only return explicitly what we need to the front end
 		const cleanUser = {
 			_id: user._id,
@@ -99,7 +104,7 @@ router.post(
 		res.json({ user: cleanUser,
 			pets: user.pets,
 			eggs: user.eggs })
-	}
+	} */
 )
 //Create the user in the db
 

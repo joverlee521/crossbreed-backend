@@ -6,7 +6,8 @@ module.exports = {
   //This can be done by anyone, as we are ONLY showing the pets that person has
   //We might use this when a person views their pal's stable (for example)
   findOne: function (req, res) {
-    db.User.findById(req.params.userId, '_id displayName') //never return any other user info!
+    db.User.findById(req.params.userId, '_id displayName pets eggs')
+      .populate('pets')
       .then(results => res.json(results))
       .catch(err => res.status(500).json(err));
   },

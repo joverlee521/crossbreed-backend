@@ -83,7 +83,7 @@ module.exports = {
         result.dna = "";
         res.json(result);
       })
-      .catch(err => res.json(err));
+      .catch(err => res.status(500).json(err));
   },
 
   // Delete one pet (belonging to a particular user)
@@ -100,7 +100,7 @@ module.exports = {
 
     db.Pet.deleteOne({ _id: req.params.petId, user: loggedInUser })
       .then(result => res.json(result))
-      .catch(err => res.json(err));
+      .catch(err => res.status(500).json(err));
   },
 
   // Update the specified pet (belonging to a particular user)
@@ -151,6 +151,6 @@ module.exports = {
     // Update pet and return the new pet stats (if anything did update successfully)
     db.Pet.findOneAndUpdate({ _id: req.params.petId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
       .then(result => res.json(result))
-      .catch(err => res.json(err));
+      .catch(err => res.status(500).json(err));
   }
 };

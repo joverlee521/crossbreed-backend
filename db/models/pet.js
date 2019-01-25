@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dnaCheck = require("../validators/dnaValidator");
+const dnaCheck = require("../../validators/dnaValidator");
 
 const petSchema = new mongoose.Schema({
   name: {

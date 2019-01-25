@@ -25,9 +25,7 @@ router.post(
 		//Only return explicitly what we need to the front end
 		const cleanUser = {
 			_id: user._id,
-			displayName: user.displayName,
-/* 			pets: user.pets,
-			eggs: user.eggs */
+			displayName: user.displayName
 		};
 		res.json({ user: cleanUser })
 	}
@@ -64,11 +62,25 @@ router.post('/signup', (req, res) => {
 		newUser.save((err, savedUser) => {
 			if (err) return res.json(err)
 			//NOTE: make sure we ONLY return the minimum stuff we need to know about the user -- ie, their _id and pets array
-			return res.json(
+
+			//Now that the user exists, let's go ahead and authenticate them
+			passport.authenticate('local'),
+			(req, res) => {
+				console.log('Logging in after creating the local user!');
+				const user = JSON.parse(JSON.stringify(req.user)); // hack
+				//Only return explicitly what we need to the front end
+				const cleanUser = {
+					_id: user._id,
+					displayName: user.displayName
+				};
+				res.json({ user: cleanUser });
+			}
+
+			/* return res.json(
 				{	_id: savedUser._id,
 					displayName: savedUser.displayName,
 				  	pets: savedUser.pets
-				})
+				}) */
 		})
 	})
 })

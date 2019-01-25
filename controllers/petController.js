@@ -62,10 +62,13 @@ module.exports = {
   },
 
   createStarterPet: function (req, res) {
+    console.log("Trying to create a starter pet");
     if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      console.log("Not logged in");
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+    console.log("Logged in as " + loggedInUser);
 
     //sanity check if the id doesn't match the route, also reject with forbidden
     if (loggedInUser !== req.params.userId) {

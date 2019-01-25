@@ -13,7 +13,7 @@ const passport = require('../../passport');
 
 router.post(
 	'/login',
-	function(req, res, next) {
+	function (req, res, next) {
 		console.log(req.body)
 		console.log('================')
 		next()
@@ -42,7 +42,7 @@ router.post('/logout', (req, res) => {
 })
 
 router.post('/signup', (req, res) => {
-	const { username, password, displayName /* firstName, lastName, photo,  */ } = req.body
+	const { username, password, displayName } = req.body
 	console.log("REQ.BODY: ", req.body)
 	// ADD VALIDATION
 	User.findOne({ 'local.username': username }, (err, userMatch) => {
@@ -54,33 +54,20 @@ router.post('/signup', (req, res) => {
 		const newUser = new User({
 			'local.username': username,
 			'local.password': password,
-			displayName,
-		/* 	firstName,
-			lastName,
-			photo */
+			displayName
 		})
 		newUser.save((err, savedUser) => {
-			if (err) return res.json(err)
+			if (err) return res.status(500).json(err);
+			//IN HERE: we need to also start a session
+			console.log(passport.authenticate('local'));
+
 			//NOTE: make sure we ONLY return the minimum stuff we need to know about the user -- ie, their _id and pets array
 
-			//Now that the user exists, let's go ahead and authenticate them
-			passport.authenticate('local'),
-			(req, res) => {
-				console.log('Logging in after creating the local user!');
-				const user = JSON.parse(JSON.stringify(req.user)); // hack
-				//Only return explicitly what we need to the front end
-				const cleanUser = {
-					_id: user._id,
-					displayName: user.displayName
-				};
-				res.json({ user: cleanUser });
-			}
-
-			/* return res.json(
-				{	_id: savedUser._id,
-					displayName: savedUser.displayName,
-				  	pets: savedUser.pets
-				}) */
+			const cleanUser = {
+				_id: savedUser._id,
+				displayName: savedUser.displayName
+			};
+			res.json({ user: cleanUser });
 		})
 	})
 })
@@ -89,16 +76,61 @@ router.post('/signup', (req, res) => {
 // Will look for googleId in the database, will create doc if it doesn't exist already
 router.post('/login/google', (req, res) => {
 	const { id, givenName } = req.body;
-	User.findOneAndUpdate({ 'google.googleId': id }, {$set: { 'displayName': givenName }}, { upsert: true, new: true }, (err, user) => {
-		if(err) return res.json(err);
+	User.findOneAndUpdate({ 'google.googleId': id }, { $set: { 'displayName': givenName } }, { upsert: true, new: true }, (err, user) => {
+		if (err) return res.json(err);
 		return res.json(
 			{
 				_id: user._id,
-				displayName: user.displayName,
-				pets: user.pets
+				displayName: user.displayName
 			}
 		)
 	})
 })
 
-module.exports = router
+router.post(
+	'/test',
+	function (req, res, next) {
+		console.log(req.body)
+		console.log('======INCOMING NEW USER==========')
+		const { username, password, displayName } = req.body
+		console.log("REQ.BODY: ", req.body)
+		// ADD VALIDATION
+		User.findOne({ 'local.username': username }, (err, userMatch) => {
+			if (userMatch) {
+				return res.json({
+					error: `Sorry, already a user with the username: ${username}`
+				})
+			}
+			const newUser = new User({
+				'local.username': username,
+				'local.password': password,
+				displayName
+			})
+			newUser.save((err, savedUser) => {
+				if (err) return res.status(500).json(err);
+
+				//NOTE: make sure we ONLY return the minimum stuff we need to know about the user -- ie, their _id and pets array
+				next();
+			})
+		})
+	},
+	passport.authenticate('local'),
+	(req, res) => {
+		console.log('POSTING after we first signed up and are now logged in')
+		const user = JSON.parse(JSON.stringify(req.user)) // hack
+		//Only return explicitly what we need to the front end
+		const cleanUser = {
+			_id: user._id,
+			displayName: user.displayName
+		};
+		res.json({ user: cleanUser })
+	}
+)
+//Create the user in the db
+
+//Authenticate the user with passport
+
+//Resolve to the front end with the token
+
+
+module.exports = router;

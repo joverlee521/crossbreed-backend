@@ -7,11 +7,11 @@ mongoose.promise = Promise
 const userSchema = new Schema({
   displayName: { type: String, unique: true, required: true },
   local: { //if using username/password
-		username: { type: String, unique: true, sparse: true, required: false },
+		username: { type: String, unique: true, required: false, sparse: true },
 		password: { type: String, unique: false, required: false }
   },
   google: { //if using google auth
-	  googleId: { type: String, sparse: true, required: false }
+	  googleId: { type: String, unique: true, sparse: true, required: false }
 	},
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }],
   eggs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Egg' }],

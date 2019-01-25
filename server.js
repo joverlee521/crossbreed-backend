@@ -47,7 +47,7 @@ app.use(function(req, res, next) {
 	next()
 })
 // testing
-/* app.get(
+app.get(
 	'/auth/google/callback',
 	(req, res, next) => {
 		console.log(`req.user: ${req.user}`)
@@ -55,10 +55,10 @@ app.use(function(req, res, next) {
 		next()
 	},
 	passport.authenticate('google', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: 'http://localhost:3000/login'
+		successRedirect: 'https://crossbreed-backend.herokuapp.com',
+		failureRedirect: 'https://crossbreed-backend.herokuapp.com/login'
 	})
-) */
+) 
 
 /* Express app ROUTING */
 const routes = require('./routes');
@@ -71,7 +71,6 @@ app.use(function(err, req, res, next) {
 	res.status(500)
 })
 
-// ==== Starting Server =====
 app.listen(PORT, () => {
 	console.log(`App listening on PORT: ${PORT}`)
 })

@@ -27,7 +27,11 @@ router.post(
 			_id: user._id,
 			displayName: user.displayName
 		};
-		res.json({ user: cleanUser })
+		res.json({
+			user: cleanUser,
+			pets: user.pets,
+			eggs: user.eggs
+		})
 	}
 )
 
@@ -92,7 +96,9 @@ router.post(
 			_id: user._id,
 			displayName: user.displayName
 		};
-		res.json({ user: cleanUser })
+		res.json({ user: cleanUser,
+			pets: user.pets,
+			eggs: user.eggs })
 	}
 )
 //Create the user in the db

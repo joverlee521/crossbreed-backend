@@ -10,7 +10,6 @@ router.get('/:userId', userController.findOne); //Find basic details + pets + eg
 router.put('/:userId', userController.update); //Update select user info (like their display name)
 router.delete('/:userId', userController.delete); //Delete my user account (and all my pets/eggs)
 
-
 //SPECIAL ROUTE FOR A STARTER PET
 router.post("/:userId/starterPet", petsController.createStarterPet); //Create a new pet (from one of the stock starter eggs)
 

@@ -41,37 +41,6 @@ router.post('/logout', (req, res) => {
 	}
 })
 
-router.post('/signup', (req, res) => {
-	const { username, password, displayName } = req.body
-	console.log("REQ.BODY: ", req.body)
-	// ADD VALIDATION
-	User.findOne({ 'local.username': username }, (err, userMatch) => {
-		if (userMatch) {
-			return res.json({
-				error: `Sorry, already a user with the username: ${username}`
-			})
-		}
-		const newUser = new User({
-			'local.username': username,
-			'local.password': password,
-			displayName
-		})
-		newUser.save((err, savedUser) => {
-			if (err) return res.status(500).json(err);
-			//IN HERE: we need to also start a session
-			console.log(passport.authenticate('local'));
-
-			//NOTE: make sure we ONLY return the minimum stuff we need to know about the user -- ie, their _id and pets array
-
-			const cleanUser = {
-				_id: savedUser._id,
-				displayName: savedUser.displayName
-			};
-			res.json({ user: cleanUser });
-		})
-	})
-})
-
 // Route for logging in with Google on the front-end
 // Will look for googleId in the database, will create doc if it doesn't exist already
 router.post('/login/google', (req, res) => {
@@ -88,7 +57,7 @@ router.post('/login/google', (req, res) => {
 })
 
 router.post(
-	'/test',
+	'/signup',
 	function (req, res, next) {
 		console.log(req.body)
 		console.log('======INCOMING NEW USER==========')

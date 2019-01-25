@@ -1,12 +1,20 @@
 //BREEDING PET FUNCTIONS -- EGG CREATION
 //Goal is to create new eggs from parental DNA
 
+const checkDNA = require("../validators/dnaValidator");
+
 const Egg = {
     //The pet constructor takes in two parents and produces an egg to contain offspring
 
     createFromParents: function (mom, dad) {
         //first, validate that mom & dad have the right expected structure - if not, everything will break
-        //(TO-DO) Add error checking with Joi
+        if(!mom.hasOwnProperty('dna') || !dad.hasOwnProperty('dna')) {
+            return new Error("Parents must have DNA!");
+        }
+
+        if(!checkDNA.isValidDNA(mom.dna) || (!checkDNA.isValidDNA(dad.dna))) {
+            return new Error("Parents must have valid DNA!");
+        }        
 
         const child = {
             dna: {},

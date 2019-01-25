@@ -11,8 +11,8 @@ module.exports = {
      .catch(err => res.json(err));
   },
   //Find a user by their email
-  findUserByEmail: function(req, res) {
-     User.find({email: req.body.email})
+  findUserByToken: function(req, res) {
+     User.find({token: req.body.token})
      .then(results => res.json(results))
      .catch(err=> res.json(err));
   },

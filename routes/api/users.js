@@ -7,7 +7,7 @@ const eggsController = require("../../controllers/eggController");
 
 //RESTFUL routes for all users
 router.post('/', userController.create);
-router.get('/', userController.findUserByEmail);
+router.get('/', userController.findUserByToken); //NOTE: WE NEED TO WORK ON THIS
 
 //RESTFUL routes for a single user
 router.get('/:userId', userController.findOne);

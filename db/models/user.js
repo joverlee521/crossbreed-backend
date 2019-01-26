@@ -40,6 +40,13 @@ userSchema.pre('save', function(next) {
 	// next()
 })
 
+userSchema.methods.toJSON = function() {
+	const obj = this.toObject();
+	delete obj.local;
+	delete obj.google;
+	return obj;
+}
+
 // Create reference to User & export
 const User = mongoose.model('User', userSchema)
 module.exports = User

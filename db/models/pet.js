@@ -57,6 +57,12 @@ const petSchema = new mongoose.Schema({
   }
 });
 
+petSchema.methods.toJSON = function() {
+	const obj = this.toObject();
+	delete obj.dna;
+	return obj;
+}
+
 const Pet = mongoose.model("Pet", petSchema);
 module.exports = Pet;
 

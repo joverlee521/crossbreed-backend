@@ -90,21 +90,6 @@ router.post(
 		})
 	},
 	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
-	/* (req, res) => {
-		console.log('POSTING after we first signed up and are now logged in')
-		const user = JSON.parse(JSON.stringify(req.user)) // hack
-		//create two starter pets and save to the db for that new user, then return the complete logged in user to the front end
-		
-
-		//Only return explicitly what we need to the front end
-		const cleanUser = {
-			_id: user._id,
-			displayName: user.displayName
-		};
-		res.json({ user: cleanUser,
-			pets: user.pets,
-			eggs: user.eggs })
-	} */
 )
 //Create the user in the db
 

@@ -85,21 +85,19 @@ module.exports = {
 
     //finally, continue updating the user model with the pets
     const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
-      $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id]} }
+      $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id] } }
     }, { new: true });
 
     firstPet.dna = ""; //hack
     secondPet.dna = ""; //hack
 
     res.json({
-      user: {
-        _id: updatedUserResult._id,
-        displayName: updatedUserResult.displayName,
-        pets: [firstPet, secondPet],
-        eggs: []
-      }
-    }); 
-  },
+      _id: updatedUserResult._id,
+      displayName: updatedUserResult.displayName,
+      pets: [firstPet, secondPet],
+      eggs: []
+    });
+},
 
   // Delete one pet (belonging to a particular user)
   delete: function (req, res) {
@@ -118,54 +116,54 @@ module.exports = {
       .catch(err => res.status(500).json(err));
   },
 
-  // Update the specified pet (belonging to a particular user)
-  // Valid attributes to update at present are isFavorite, pet name, and level/xp/gainedxp
-  update: function (req, res) {
-    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
-      return res.sendStatus(403);
-    }
-    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+// Update the specified pet (belonging to a particular user)
+// Valid attributes to update at present are isFavorite, pet name, and level/xp/gainedxp
+update: function (req, res) {
+  if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
+    return res.sendStatus(403);
+  }
+  const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
+  //sanity check if the id doesn't match the route, also reject with forbidden
+  if (loggedInUser !== req.params.userId) {
+    return res.sendStatus(403);
+  }
 
-    //Check what we passed in -- if we didn't set at least one of the possible options, reject as malformed
-    if (!req.body.isFavorite && !req.body.name && !req.body.currentLevel && !req.body.currentXP && !req.body.gainedXP) {
+  //Check what we passed in -- if we didn't set at least one of the possible options, reject as malformed
+  if (!req.body.isFavorite && !req.body.name && !req.body.currentLevel && !req.body.currentXP && !req.body.gainedXP) {
+    return res.sendStatus(400);
+  }
+
+  //Now we populate our options based on what we received in the req.body
+  const options = { $set: {} };
+
+  // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
+  if (req.body.currentLevel && req.body.currentXP && req.body.gainedXP) {
+    const currentLevel = parseInt(req.body.currentLevel);
+    const currentXP = parseInt(req.body.currentXP);
+    const gainedXP = parseInt(req.body.gainedXP);
+    //if you send garbage in for the level data, reject as a malformed request
+    if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
       return res.sendStatus(400);
     }
-
-    //Now we populate our options based on what we received in the req.body
-    const options = { $set: {} };
-
-    // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-    if (req.body.currentLevel && req.body.currentXP && req.body.gainedXP) {
-      const currentLevel = parseInt(req.body.currentLevel);
-      const currentXP = parseInt(req.body.currentXP);
-      const gainedXP = parseInt(req.body.gainedXP);
-      //if you send garbage in for the level data, reject as a malformed request
-      if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
-        return res.sendStatus(400);
-      }
-      //otherwise calculate the level
-      // Pass variables through calculation function and return results as update arg
-      const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
-      options.$set["level"] = newLevel;
-      options.$set["experiencePoints"] = newXP;
-    }
-
-    if (req.body.isFavorite) {
-      options.$set["isFavorite"] = req.body.isFavorite;
-    }
-
-    if (req.body.name) {
-      options.$set["name"] = req.body.name;
-    }
-
-    // Update pet and return the new pet stats (if anything did update successfully)
-    db.Pet.findOneAndUpdate({ _id: req.params.petId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
-      .then(result => res.json(result))
-      .catch(err => res.status(500).json(err));
+    //otherwise calculate the level
+    // Pass variables through calculation function and return results as update arg
+    const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
+    options.$set["level"] = newLevel;
+    options.$set["experiencePoints"] = newXP;
   }
+
+  if (req.body.isFavorite) {
+    options.$set["isFavorite"] = req.body.isFavorite;
+  }
+
+  if (req.body.name) {
+    options.$set["name"] = req.body.name;
+  }
+
+  // Update pet and return the new pet stats (if anything did update successfully)
+  db.Pet.findOneAndUpdate({ _id: req.params.petId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
+    .then(result => res.json(result))
+    .catch(err => res.status(500).json(err));
+}
 };

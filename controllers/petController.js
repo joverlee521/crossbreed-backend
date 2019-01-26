@@ -51,11 +51,11 @@ module.exports = {
     //push the hatched pet to the user's array of eggs...
     const hatchedPet = results[1];
     await Promise.all([
-      db.Pet.findByIdAndUpdate(hatchedPet.parents[0], {$push: { children: hatchedPet._id }}), 
-      db.Pet.findByIdAndUpdate(hatchedPet.parents[1], {$push: { children: hatchedPet._id }}), 
+      db.Pet.findByIdAndUpdate(hatchedPet.parents[0], { $push: { children: hatchedPet._id } }),
+      db.Pet.findByIdAndUpdate(hatchedPet.parents[1], { $push: { children: hatchedPet._id } }),
       db.User.findByIdAndUpdate(loggedInUser, {
-      $push: { pets: hatchedPet._id }, $pull: { eggs: eggData._id }
-    })]);
+        $push: { pets: hatchedPet._id }, $pull: { eggs: eggData._id }
+      })]);
 
     //though we return only the new pet (minus the dna) to the front end
     res.json(hatchedPet);
@@ -119,8 +119,18 @@ module.exports = {
     //Now we populate our options based on what we received in the req.body
     const options = { $set: {} };
 
+    //Check if we are updating isFavorite
+    if (req.body.isFavorite!==undefined) {
+      options.$set["isFavorite"] = req.body.isFavorite;
+    }
+
+    //Check if we updating the name
+    if (req.body.name) {
+      options.$set["name"] = req.body.name;
+    }
+
     // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-    if (req.body.currentLevel && req.body.currentXP && req.body.gainedXP) {
+    if (req.body.currentLevel !== undefined && req.body.currentXP !== undefined && req.body.gainedXP !== undefined) {
       const currentLevel = parseInt(req.body.currentLevel);
       const currentXP = parseInt(req.body.currentXP);
       const gainedXP = parseInt(req.body.gainedXP);
@@ -128,29 +138,6 @@ module.exports = {
       if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
         return res.sendStatus(400);
       }
-      //otherwise calculate the level
-      // Pass variables through calculation function and return results as update arg
-      const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
-      options.$set["level"] = newLevel;
-      options.$set["experiencePoints"] = newXP;
-    }
-
-
-    if (req.body.isFavorite) {
-      options.$set["isFavorite"] = req.body.isFavorite;
-
-  // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-  if (req.body.currentLevel !== undefined && req.body.currentXP !== undefined && req.body.gainedXP !== undefined) {
-    const currentLevel = parseInt(req.body.currentLevel);
-    const currentXP = parseInt(req.body.currentXP);
-    const gainedXP = parseInt(req.body.gainedXP);
-    //if you send garbage in for the level data, reject as a malformed request
-    if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
-      return res.sendStatus(400);
-    }
-
-    if (req.body.name) {
-      options.$set["name"] = req.body.name;
     }
 
     // Update pet and return the new pet stats (if anything did update successfully)

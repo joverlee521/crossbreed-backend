@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const dnaCheck = require("../../validators/dnaValidator");
 
 const petSchema = new mongoose.Schema({
   name: {
@@ -46,8 +47,21 @@ const petSchema = new mongoose.Schema({
   outlineColor: {},
   gameColor: {},
   parents: [{ type: mongoose.Schema.Types.ObjectId }],
-  dna: {}
+  dna: {
+    type: mongoose.Schema.Types.Mixed, 
+    validate: {
+    validator: function(val) {
+      return dnaCheck.isValidDNA(val);
+    }
+  }
+  }
 });
+
+petSchema.methods.toJSON = function() {
+	const obj = this.toObject();
+	delete obj.dna;
+	return obj;
+}
 
 const Pet = mongoose.model("Pet", petSchema);
 module.exports = Pet;

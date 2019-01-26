@@ -11,7 +11,7 @@ const userSchema = new Schema({
 		password: { type: String, unique: false, required: false }
   },
   google: { //if using google auth
-	  googleId: { type: String, required: false }
+	  googleId: { type: String, unique: true, sparse: true, required: false }
 	},
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }],
   eggs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Egg' }],
@@ -39,6 +39,13 @@ userSchema.pre('save', function(next) {
 	// this.password = this.hashPassword(this.password)
 	// next()
 })
+
+userSchema.methods.toJSON = function() {
+	const obj = this.toObject();
+	delete obj.local;
+	delete obj.google;
+	return obj;
+}
 
 // Create reference to User & export
 const User = mongoose.model('User', userSchema)

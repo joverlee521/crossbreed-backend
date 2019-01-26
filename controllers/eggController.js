@@ -6,20 +6,16 @@ const db = require("../db/models");
 const Egg = require("../scripts/createEggs");
 
 module.exports = {
-  //PUBLIC ACTIONS 
-  findAllEggsByUser: function (req, res) {
-    db.Egg.find({ user: req.params.userId }, { dna: 0 }) //return everything but the dna
-      .then(results => {
-        if(!results) {
-          return res.sendStatus(404);
-        }
-        return res.json(results)
-      })
-      .catch(err => res.sendStatus(500));
-  },
+
   //Find one egg by user: 
   findOneByUser: function (req, res) {
-    db.Egg.findOne({ _id: req.params.eggId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
+
+    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+
+    db.Egg.findOne({ _id: req.params.eggId, user: loggedInUser }, { dna: 0 }) //return everything except the dna
       .then(result => { 
         if(!result) {
           return res.sendStatus(404);
@@ -42,11 +38,6 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
-
     //make sure we have at least two distinct parent IDs
     if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
       return res.sendStatus(400);
@@ -62,9 +53,10 @@ module.exports = {
       return res.sendStatus(404);
     }
 
+
     //Finally!  We can create an egg :)
     const newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);
-
+  
     //now we save the child to the db under this user's name 
     //and update the parents to show they have recently bred
     newEgg['user'] = loggedInUser;
@@ -75,9 +67,14 @@ module.exports = {
       db.Egg.create(newEgg)]);
 
     //only send the egg back to the front end -- after removing the dna
-    const eggResult = results[2];
-    eggResult.dna = "";
-    res.json(eggResult);
+    const dbSavedEgg = results[2];
+    
+    //lastly, update the user's array of egg objects
+    const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
+      $push: { eggs: { $each: [dbSavedEgg._id] } }
+    }, { new: true });
+
+    res.json(dbSavedEgg);
   },
 
   // Delete an egg
@@ -86,11 +83,6 @@ module.exports = {
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
-
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
 
     db.Egg.deleteOne({ _id: req.params.eggId, user: loggedInUser })
       .then(result => res.json(result))
@@ -102,11 +94,6 @@ module.exports = {
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
-
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
 
     //NOTE: at this time the only things we can change are the isFrozen and countdown timers
     //TO-DO add the count-down timer!

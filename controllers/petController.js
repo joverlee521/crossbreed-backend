@@ -86,17 +86,11 @@ module.exports = {
     //finally, continue updating the user model with the pets
     const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
       $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id] } }
-    }, { new: true });
+    }, { new: true })
+    .populate('pets', { dna: 0})
+    .populate('eggs', {dna: 0 });
 
-    firstPet.dna = ""; //hack
-    secondPet.dna = ""; //hack
-
-    res.json({
-      _id: updatedUserResult._id,
-      displayName: updatedUserResult.displayName,
-      pets: [firstPet, secondPet],
-      eggs: []
-    });
+    res.json(updatedUserResult);
 },
 
   // Delete one pet (belonging to a particular user)

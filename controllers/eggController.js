@@ -42,11 +42,6 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
-
     //make sure we have at least two distinct parent IDs
     if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
       return res.sendStatus(400);

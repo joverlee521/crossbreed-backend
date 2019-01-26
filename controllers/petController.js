@@ -4,18 +4,15 @@ const Pet = require("../scripts/hatchEggs");
 const calcLevelAndXP = require("../scripts/levelSystem");
 
 module.exports = {
-  //UNPROTECTED METHODS (GET)
-  //Find all pets (for a particular user)
-  findAllPetsByUser: function (req, res) {
-    db.Pet.find({ user: req.params.userId }, { dna: 0 })
-      .then(results => res.json(results))
-      .catch(err => res.sendStatus(500));
-  },
-
   //Find one pet (that belongs to a user)
   //Looks up a particular pet 
   findOneByUser: function (req, res) {
-    db.Pet.findOne({ _id: req.params.petId, user: req.params.userId }, { dna: 0 }) //return everything except the dna
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+    
+    db.Pet.findOne({ _id: req.params.petId, user: loggedInUser }, { dna: 0 }) //return everything except the dna
       .then(result => res.json(result))
       .catch(err => res.sendStatus(500));
   },
@@ -31,11 +28,6 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
     console.log("My name is: " + req.session.passport.displayName);
-
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
 
     //Expects the _id of an egg to hatch from the body of the request
     if (!req.body._id) {
@@ -100,11 +92,6 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-    //sanity check if the id doesn't match the route, also reject with forbidden
-    if (loggedInUser !== req.params.userId) {
-      return res.sendStatus(403);
-    }
-
     db.Pet.deleteOne({ _id: req.params.petId, user: loggedInUser })
       .then(result => res.json(result))
       .catch(err => res.status(500).json(err));
@@ -117,11 +104,6 @@ update: function (req, res) {
     return res.sendStatus(403);
   }
   const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
-
-  //sanity check if the id doesn't match the route, also reject with forbidden
-  if (loggedInUser !== req.params.userId) {
-    return res.sendStatus(403);
-  }
 
   //Check what we passed in -- if we didn't set at least one of the possible options, reject as malformed
   if (!req.body.isFavorite && !req.body.name && !req.body.currentLevel && !req.body.currentXP && !req.body.gainedXP) {

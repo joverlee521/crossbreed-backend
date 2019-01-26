@@ -22,18 +22,6 @@ router.post(
 		next()
 	},
 	passport.authenticate('local'), userController.findOne
-/* 	(req, res) => {
-		console.log('POST to /login')
-		console.log(req.user);
-		const user = JSON.parse(JSON.stringify(req.user)) // hack
-		const loggedInUserID = user._id;
-		//grab and populate the full deets for the user
-
-
-		res.json({
-			_id: loggedInUserID
-		})
-	} */
 )
 
 router.post('/logout', (req, res) => {

@@ -87,7 +87,7 @@ module.exports = {
     }
 
     //finally, update the user, then send the updated user (and their pets) back to the front end
-    const updatedUser = await db.User.findOneAndUpdate({_id: loggedInUser}, options, { new: true}).populate('pets', { dna: 0 }).populate('eggs', {dna: 0});
+    const updatedUser = await db.User.findOneAndUpdate({_id: loggedInUser}, options, { new: true, runValidators: true, fields: '_id displayName' });
     
     res.json(updatedUser);
 

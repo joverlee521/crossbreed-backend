@@ -114,7 +114,7 @@ update: function (req, res) {
   const options = { $set: {} };
 
   // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-  if (req.body.currentLevel && req.body.currentXP && req.body.gainedXP) {
+  if (req.body.currentLevel !== undefined && req.body.currentXP !== undefined && req.body.gainedXP !== undefined) {
     const currentLevel = parseInt(req.body.currentLevel);
     const currentXP = parseInt(req.body.currentXP);
     const gainedXP = parseInt(req.body.gainedXP);

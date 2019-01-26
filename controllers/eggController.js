@@ -70,9 +70,16 @@ module.exports = {
       db.Egg.create(newEgg)]);
 
     //only send the egg back to the front end -- after removing the dna
-    const eggResult = results[2];
-    eggResult.dna = "";
-    res.json(eggResult);
+    const dbSavedEgg = results[2];
+    
+    //lastly, update the user's array of egg objects
+    const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
+      $push: { eggs: { $each: [dbSavedEgg._id] } }
+    }, { new: true })
+    .populate('pets', { dna: 0})
+    .populate('eggs', {dna: 0 });
+
+    res.json(updatedUserResult);
   },
 
   // Delete an egg

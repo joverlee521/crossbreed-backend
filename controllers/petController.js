@@ -50,9 +50,12 @@ module.exports = {
 
     //push the hatched pet to the user's array of eggs...
     const hatchedPet = results[1];
-    await db.User.findByIdAndUpdate(loggedInUser, {
+    await Promise.all([
+      db.Pet.findByIdAndUpdate(hatchedPet.parents[0], {$push: { children: hatchedPet._id }}), 
+      db.Pet.findByIdAndUpdate(hatchedPet.parents[1], {$push: { children: hatchedPet._id }}), 
+      db.User.findByIdAndUpdate(loggedInUser, {
       $push: { pets: hatchedPet._id }, $pull: { eggs: eggData._id }
-    }, { new: true });
+    })]);
 
     //though we return only the new pet (minus the dna) to the front end
     res.json(hatchedPet);

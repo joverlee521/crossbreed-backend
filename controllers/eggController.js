@@ -38,6 +38,9 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
+    console.log("INCOMING RENTS");
+    console.log(req.body.firstParent);
+    console.log(req.body.secondParent);
     //make sure we have at least two distinct parent IDs
     if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
       return res.sendStatus(400);
@@ -45,14 +48,13 @@ module.exports = {
 
     //(TO-DO) Add the logic that prevents an egg from being created if the parents were last bred too recently
     //Note: we may be able to refactor so that it automatically updates the lastBred if indeed both parents are eligible to breed at this time?
-    const dbFirstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: loggedInUser }, ['_id', 'dna']);
-    const dbSecondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: loggedInUser }, ['_id', 'dna']);
+    const dbFirstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: loggedInUser }, ['_id', 'dna']).lean(true);
+    const dbSecondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: loggedInUser }, ['_id', 'dna']).lean(true);
 
     //Make sure we actually got valid parent results
     if (!dbFirstParent || !dbSecondParent) {
       return res.sendStatus(404);
     }
-
 
     //Finally!  We can create an egg :)
     const newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);

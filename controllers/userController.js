@@ -62,7 +62,7 @@ module.exports = {
   },
 
   // Update the specified user's pet list
-  update: function (req, res) {
+  update: async function (req, res) {
     if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
@@ -76,30 +76,21 @@ module.exports = {
     //Things the user is allowed to update themselves: 
     //1) their display name (so long as the new one is unique)
     //2) which pets they have
-    if (!req.body.pets && !req.body.displayName) {
+    if (!req.body.displayName) {
       return res.sendStatus(400);
     }
     //Set the options
     const options = { $set: {} };
 
-    //(TO-DO) consider if we should be using a push here instead?  will need to look at 
-    if (req.body.pets) {
-      options.$set['pets'] = req.body.pets;
-    }
-
     if (req.body.displayName) {
       options.$set['displayName'] = req.body.displayName;
     }
 
-    //finally, try to perform the update   
-    db.User.findByIdAndUpdate(loggedInUser, options, { select: '_id pets displayName', new: true })
-      .then(result => {
-        if (!result) {
-          return res.sendStatus(404);
-        }
-        return res.json(result);
-      })
-      .catch(err => res.status(500).json(err));
+    //finally, update the user, then send the updated user (and their pets) back to the front end
+    const updatedUser = await db.User.findOneAndUpdate({_id: loggedInUser}, options, { new: true}).populate('pets', { dna: 0 }).populate('eggs', {dna: 0});
+    
+    res.json(updatedUser);
+
   }
 
 };

@@ -135,19 +135,8 @@ module.exports = {
       options.$set["experiencePoints"] = newXP;
     }
 
-<<<<<<< HEAD
     if (req.body.isFavorite) {
       options.$set["isFavorite"] = req.body.isFavorite;
-=======
-  // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-  if (req.body.currentLevel !== undefined && req.body.currentXP !== undefined && req.body.gainedXP !== undefined) {
-    const currentLevel = parseInt(req.body.currentLevel);
-    const currentXP = parseInt(req.body.currentXP);
-    const gainedXP = parseInt(req.body.gainedXP);
-    //if you send garbage in for the level data, reject as a malformed request
-    if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
-      return res.sendStatus(400);
->>>>>>> 35bf26b71f0657369f4fdb065662643e1820d775
     }
 
     if (req.body.name) {

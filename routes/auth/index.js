@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../db/models/user');
 const petController = require('../../controllers/petController');
+const userController = require('../../controllers/userController');
 const passport = require('../../passport');
 const asyncMiddleWare = require('../middleware/async');
 
@@ -20,21 +21,19 @@ router.post(
 		console.log('================')
 		next()
 	},
-	passport.authenticate('local'),
-	(req, res) => {
+	passport.authenticate('local'), userController.findOne
+/* 	(req, res) => {
 		console.log('POST to /login')
+		console.log(req.user);
 		const user = JSON.parse(JSON.stringify(req.user)) // hack
-		//Only return explicitly what we need to the front end
-		const cleanUser = {
-			_id: user._id,
-			displayName: user.displayName
-		};
+		const loggedInUserID = user._id;
+		//grab and populate the full deets for the user
+
+
 		res.json({
-			user: cleanUser,
-			pets: user.pets,
-			eggs: user.eggs
+			_id: loggedInUserID
 		})
-	}
+	} */
 )
 
 router.post('/logout', (req, res) => {

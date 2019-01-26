@@ -1,12 +1,21 @@
 // Main User Controller
 // ============================
 const db = require('../db/models');
+
 module.exports = {
   //Find (one) user
   //This can be done by anyone, as we are ONLY showing the pets that person has
   //We might use this when a person views their pal's stable (for example)
   findOne: function (req, res) {
-    db.User.findById(req.params.userId) //never return any other user info!
+    console.log("FINDING THE USER");
+    console.log(req.session.passport);
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
+      return res.sendStatus(403);
+    }
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+    console.log("Logged in as " + loggedInUser);
+
+    db.User.findById(loggedInUser) //never return any other user info!
       .populate('pets', { dna: 0 })
       .populate('eggs', { dna: 0 })
       .then(results => res.json(results))

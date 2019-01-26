@@ -138,6 +138,9 @@ module.exports = {
       if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
         return res.sendStatus(400);
       }
+      const { newLevel, newXP } = calcLevelAndXP(currentLevel, currentXP, gainedXP);
+      options.$set["level"] = newLevel;
+      options.$set["experiencePoints"] = newXP;
     }
 
     // Update pet and return the new pet stats (if anything did update successfully)

@@ -106,6 +106,7 @@ module.exports = {
   // Update the specified pet (belonging to a particular user)
   // Valid attributes to update at present are isFavorite, pet name, and level/xp/gainedxp
   update: function (req, res) {
+
     if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
@@ -120,7 +121,7 @@ module.exports = {
     const options = { $set: {} };
 
     //Check if we are updating isFavorite
-    if (req.body.isFavorite!==undefined) {
+    if (req.body.isFavorite===true || req.body.isFavorite===false) {
       options.$set["isFavorite"] = req.body.isFavorite;
     }
 
@@ -130,14 +131,13 @@ module.exports = {
     }
 
     // Check that we have all the necessary variables to calculate level and XP; if not, don't adjust those
-    if (req.body.currentLevel !== undefined && req.body.currentXP !== undefined && req.body.gainedXP !== undefined) {
-      const currentLevel = parseInt(req.body.currentLevel);
-      const currentXP = parseInt(req.body.currentXP);
-      const gainedXP = parseInt(req.body.gainedXP);
-      //if you send garbage in for the level data, reject as a malformed request
-      if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
-        return res.sendStatus(400);
-      }
+    const currentLevel = parseInt(req.body.currentLevel);
+    const currentXP = parseInt(req.body.currentXP);
+    const gainedXP = parseInt(req.body.gainedXP);
+
+    //if you send garbage in for the level data, reject as a malformed request
+    if (isNaN(currentLevel) || isNaN(currentXP) || isNaN(gainedXP)) {
+      return res.sendStatus(400);
     }
 
     // Update pet and return the new pet stats (if anything did update successfully)

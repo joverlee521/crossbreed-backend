@@ -46,19 +46,6 @@ app.use(function(req, res, next) {
 	console.log('===== END =======')
 	next()
 })
-// testing
-/* app.get(
-	'/auth/google/callback',
-	(req, res, next) => {
-		console.log(`req.user: ${req.user}`)
-		console.log('======= /auth/google/callback was called! =====')
-		next()
-	},
-	passport.authenticate('google', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: 'http://localhost:3000/login'
-	})
-) */
 
 /* Express app ROUTING */
 const routes = require('./routes');

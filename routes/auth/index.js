@@ -83,10 +83,27 @@ router.post('/login/google', (req, res) => {
 			{
 				_id: user._id,
 				displayName: user.displayName,
-				pets: user.pets
+				pets: user.pets,
+				eggs: user.eggs
 			}
 		)
 	})
 })
+
+// testing
+router.get(
+	'/google/callback',
+	(req, res, next) => {
+		console.log(`req.user: ${req.user}`)
+		console.log('======= /auth/google/callback was called! =====')
+		next()
+	},
+	passport.authenticate('google', {
+		successRedirect: 'http://localhost:3001',
+		failureRedirect: 'http://localhost:3001/login'
+	})
+) 
+
+
 
 module.exports = router

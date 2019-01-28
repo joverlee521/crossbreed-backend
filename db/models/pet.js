@@ -47,6 +47,7 @@ const petSchema = new mongoose.Schema({
   outlineColor: {},
   gameColor: {},
   parents: [{ type: mongoose.Schema.Types.ObjectId }],
+  children: [{ type: mongoose.Schema.Types.ObjectId }],
   dna: {
     type: mongoose.Schema.Types.Mixed, 
     validate: {

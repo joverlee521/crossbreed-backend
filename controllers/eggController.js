@@ -10,14 +10,14 @@ module.exports = {
   //Find one egg by user: 
   findOneByUser: function (req, res) {
 
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
     db.Egg.findOne({ _id: req.params.eggId, user: loggedInUser }, { dna: 0 }) //return everything except the dna
-      .then(result => { 
-        if(!result) {
+      .then(result => {
+        if (!result) {
           return res.sendStatus(404);
         }
         return res.json(result)
@@ -33,11 +33,14 @@ module.exports = {
     //1) user object which has a _id for the logged in user
     //2) keys 'firstParent' and 'secondParent', holding obj id of the two pets to breed
     //If both parents can breed, do so, update their 'lastBred' timestamp, then save the new child to the db
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
+    console.log("INCOMING RENTS");
+    console.log(req.body.firstParent);
+    console.log(req.body.secondParent);
     //make sure we have at least two distinct parent IDs
     if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
       return res.sendStatus(400);
@@ -45,18 +48,22 @@ module.exports = {
 
     //(TO-DO) Add the logic that prevents an egg from being created if the parents were last bred too recently
     //Note: we may be able to refactor so that it automatically updates the lastBred if indeed both parents are eligible to breed at this time?
-    const dbFirstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: loggedInUser }, ['_id', 'dna']);
-    const dbSecondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: loggedInUser }, ['_id', 'dna']);
+    const dbFirstParent = await db.Pet.findOne({ _id: req.body.firstParent, user: loggedInUser }, ['_id', 'dna']).lean(true);
+    const dbSecondParent = await db.Pet.findOne({ _id: req.body.secondParent, user: loggedInUser }, ['_id', 'dna']).lean(true);
 
     //Make sure we actually got valid parent results
     if (!dbFirstParent || !dbSecondParent) {
       return res.sendStatus(404);
     }
 
-
     //Finally!  We can create an egg :)
-    const newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);
-  
+    let newEgg = {};
+    try {
+      newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);
+    }
+    catch(err) {
+      return res.sendStatus(422); //To do - change this to 500 later
+    }
     //now we save the child to the db under this user's name 
     //and update the parents to show they have recently bred
     newEgg['user'] = loggedInUser;
@@ -68,7 +75,7 @@ module.exports = {
 
     //only send the egg back to the front end -- after removing the dna
     const dbSavedEgg = results[2];
-    
+
     //lastly, update the user's array of egg objects
     const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
       $push: { eggs: { $each: [dbSavedEgg._id] } }
@@ -79,7 +86,7 @@ module.exports = {
 
   // Delete an egg
   delete: function (req, res) {
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
@@ -90,14 +97,14 @@ module.exports = {
   },
   // Update the specified egg (belonging to a user)
   update: function (req, res) {
-    if(!req.session.passport ) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
     //NOTE: at this time the only things we can change are the isFrozen and countdown timers
     //TO-DO add the count-down timer!
-    if (!typeof(req.body.isFrozen) === "boolean") { 
+    if (!typeof (req.body.isFrozen) === "boolean") {
       return res.sendStatus(400);
     }
     //TO-DO: also add a check to make sure the user has stable space to be hatching this egg!

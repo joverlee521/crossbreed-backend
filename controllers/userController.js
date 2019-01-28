@@ -16,8 +16,8 @@ module.exports = {
     console.log("Logged in as " + loggedInUser);
 
     db.User.findById(loggedInUser) //never return any other user info!
-      .populate('pets', { dna: 0 })
-      .populate('eggs', { dna: 0 })
+      .populate({path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints' })
+      .populate({path: 'eggs', select: '_id ' })
       .then(results => res.json(results))
       .catch(err => res.status(500).json(err));
   },

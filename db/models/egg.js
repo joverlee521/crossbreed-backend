@@ -7,7 +7,10 @@ const mongoose = require("mongoose");
 // Create the EggSchema with our schema class
 const eggSchema = new mongoose.Schema({
     dna: {},
-    parents: [{ type: mongoose.Schema.Types.ObjectId }],
+    parents: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Pet' 
+    }],
     createdOn: { type: Date, default: Date.now, required: [true, 'Egg must have a birthdate'] },
     isStarter: { type: Boolean, default: false},
     isFrozen: { type: Boolean, default: true }, //will become false once the user selects the egg to hatch

@@ -17,11 +17,13 @@ const asyncMiddleWare = require('../middleware/async');
 router.post(
 	'/login',
 	function (req, res, next) {
-		console.log(req.body)
-		console.log('================')
-		next()
+		passport.authenticate('local', function(err, user, info) {
+			if (err) { return res.status(500).json(err) }
+			if (!user) { return res.status(403).json( { message: info.message }) }
+			next(user);
+		  })(req, res, next);
+		userController.findOne;
 	},
-	passport.authenticate('local'), userController.findOne
 )
 
 router.post('/logout', (req, res) => {

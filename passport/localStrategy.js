@@ -11,7 +11,7 @@ const strategy = new LocalStrategy(
 				return done(err)
 			}
 			if (!userMatch) {
-				return done(null, false, { message: 'Incorrect username' })
+				return done(null, false, { message: 'No matching username' })
 			}
 			if (!userMatch.checkPassword(password)) {
 				return done(null, false, { message: 'Incorrect password' })

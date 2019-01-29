@@ -20,10 +20,15 @@ router.post(
 		passport.authenticate('local', function(err, user, info) {
 			if (err) { return res.status(500).json(err) }
 			if (!user) { return res.status(403).json( { message: info.message }) }
-			next(user);
-		  })(req, res, next);
-		userController.findOne;
-	}
+			req.login(user, (err) => {
+				if(err){
+					return res.status(500).json(err);
+				}
+				next();
+			})
+		})(req, res, next)
+	},
+	userController.findOne
 )
 
 router.post('/logout', (req, res) => {

@@ -90,11 +90,13 @@ module.exports = {
       return res.sendStatus(403);
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
+    console.log(loggedInUser);
 
     db.Egg.deleteOne({ _id: req.params.eggId, user: loggedInUser })
       .then(result => res.json(result))
       .catch(err => res.sendStatus(500));
   },
+
   // Update the specified egg (belonging to a user)
   update: function (req, res) {
     if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request

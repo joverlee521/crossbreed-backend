@@ -17,11 +17,18 @@ const asyncMiddleWare = require('../middleware/async');
 router.post(
 	'/login',
 	function (req, res, next) {
-		console.log(req.body)
-		console.log('================')
-		next()
+		passport.authenticate('local', function(err, user, info) {
+			if (err) { return res.status(500).json(err) }
+			if (!user) { return res.status(403).json( { message: info.message }) }
+			req.login(user, (err) => {
+				if(err){
+					return res.status(500).json(err);
+				}
+				next();
+			})
+		})(req, res, next)
 	},
-	passport.authenticate('local'), userController.findOne
+	userController.findOne
 )
 
 router.post('/logout', (req, res) => {
@@ -59,8 +66,8 @@ router.post(
 		// ADD VALIDATION
 		User.findOne({ 'local.username': username }, (err, userMatch) => {
 			if (userMatch) {
-				return res.json({
-					error: `Sorry, already a user with the username: ${username}`
+				return res.status(403).json({
+					message: `Sorry, the username: "${username}" is already taken`
 				})
 			}
 			const newUser = new User({

@@ -23,7 +23,7 @@ router.post(
 			next(user);
 		  })(req, res, next);
 		userController.findOne;
-	},
+	}
 )
 
 router.post('/logout', (req, res) => {
@@ -61,8 +61,8 @@ router.post(
 		// ADD VALIDATION
 		User.findOne({ 'local.username': username }, (err, userMatch) => {
 			if (userMatch) {
-				return res.json({
-					error: `Sorry, already a user with the username: ${username}`
+				return res.status(403).json({
+					message: `Sorry, the username: "${username}" is already taken`
 				})
 			}
 			const newUser = new User({

@@ -25,6 +25,7 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "joi": "^14.3.1",
+    "moment": "^2.24.0",
     "mongoose": "^5.4.3",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.9",

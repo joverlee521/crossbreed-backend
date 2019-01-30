@@ -37,7 +37,7 @@ module.exports = {
 
         //First, look up the egg 
         //(TO-DO) Validate that it has incubated long enough to hatch
-        const eggData = await db.Egg.findOne({ _id: req.body._id, user: loggedInUser, isFrozen: false }).lean(true);
+        const eggData = await db.Egg.findOne({ _id: req.body._id, user: loggedInUser, lifeStage: "readyToHatch" }).lean(true);
         if (!eggData) {
             return res.sendStatus(404);
         }

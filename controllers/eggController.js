@@ -4,6 +4,7 @@
 
 const db = require("../db/models");
 const Egg = require("../scripts/createEggs");
+const moment = require("moment");
 
 module.exports = {
 
@@ -103,9 +104,9 @@ module.exports = {
         }
         const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-        //NOTE: at this time the only things we can change are the isFrozen and countdown timers
+        //NOTE: at this time the only things we can change are the lifeStage and countdown timers
         //TO-DO add the count-down timer!
-        if (!typeof (req.body.isFrozen) === "boolean") {
+        if (!typeof (req.body.lifeStage) === "string") {
             return res.sendStatus(400);
         }
         //TO-DO: also add a check to make sure the user has stable space to be hatching this egg!
@@ -113,8 +114,13 @@ module.exports = {
         //Customize our options based on what we let the user set
         const options = { $set: {} };
 
-        if (req.body.isFrozen) {
-            options.$set["isFrozen"] = req.body.isFrozen;
+        if (req.body.lifeStage) {
+            options.$set["lifeStage"] = req.body.lifeStage;
+        }
+
+        if (req.body.startIncubate && req.body.duration) {
+            options.$set["startIncubate"] = req.body.startIncubate;
+            options.$set["willHatchOn"] = moment(req.body.startIncubate, "x").add(req.body.duration, "milliseconds");
         }
 
         // Update pet and return the new egg

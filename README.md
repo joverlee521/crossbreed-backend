@@ -34,5 +34,5 @@
 |-------|--------------|---------|---------| 
 | /api/eggs | POST | In the body: firstParent (_id of a pet the user owns) and secondParent (_id of a pet the user owns) | A new egg object (from breeding the two parents) |
 | /api/eggs/:eggId | GET | In the params: _id of the egg to get | A single egg object |
-| /api/eggs/:eggId | PUT | In the params: _id of the egg to update, attributes to update (isFrozen) | A single (updated) egg object | 
+| /api/eggs/:eggId | PUT | In the params: _id of the egg to update, attributes to update (lifeStage) | A single (updated) egg object | 
 | /api/eggs/:eggId | DELETE | In the params: _id of the egg to delete | A 200 / success |

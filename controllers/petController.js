@@ -147,6 +147,8 @@ module.exports = {
 
         // Update pet and return the new pet stats (if anything did update successfully)
         db.Pet.findOneAndUpdate({ _id: req.params.petId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
+            .populate({ path: 'parents', select: '_id name' })
+            .populate({ path: 'children', select: '_id name' })
             .then(result => res.json(result))
             .catch(err => res.status(500).json(err));
     }

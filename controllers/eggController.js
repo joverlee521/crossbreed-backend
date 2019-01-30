@@ -125,6 +125,7 @@ module.exports = {
 
         // Update pet and return the new egg
         db.Egg.findOneAndUpdate({ _id: req.params.eggId, user: loggedInUser }, options, { new: true, fields: { dna: 0 } })
+            .populate({ path: 'parents', select: '_id name' })
             .then(result => res.json(result))
             .catch(err => res.sendStatus(500));
     }

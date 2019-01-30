@@ -13,7 +13,7 @@ const eggSchema = new mongoose.Schema({
     }],
     createdOn: { type: Date, default: Date.now, required: [true, 'Egg must have a birthdate'] },
     isStarter: { type: Boolean, default: false},
-    duration: { type: Number, default: 60000 },
+    duration: { type: Number, default: 120000 },
     lifeStage: { type: String, default: "egg" },
     startIncubate: { type: String },
     willHatchOn: { type: String },

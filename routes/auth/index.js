@@ -46,15 +46,22 @@ router.post('/logout', (req, res) => {
 router.post('/login/google', (req, res) => {
 	const { id, givenName } = req.body;
 	User.findOneAndUpdate({ 'google.googleId': id }, { $set: { 'displayName': givenName } }, { upsert: true, new: true }, (err, user) => {
+		
+		console.log(user)
 		if (err) return res.json(err);
 		return res.json(
 			{
 				_id: user._id,
-				displayName: user.displayName
+				displayName: user.displayName,
+				pets: user.pets,
+				eggs: user.eggs
 			}
 		)
 	})
-})
+}
+// passport.authenticate('google'), asyncMiddleWare(petController.createStarterPet)
+
+)
 
 router.post(
 	'/signup',

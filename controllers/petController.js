@@ -80,13 +80,13 @@ module.exports = {
 
   createStarterPet: async function (req, res) {
     console.log("Trying to create a starter pet");
-    if (!req.user) { //if there is no session info, user is not logged in!  reject their request
+    if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
     // AP: Rather than using req.session.passport, I would suggest using req.user which is a more better way of accessing current logged user
     // AP: In any case, if you are able to use req.login as given in the previous function, passport should create a session for the google user and thereby making passing the authentication tests in this function
         console.log("Not logged in");
         return res.sendStatus(403);
     }
-    const loggedInUser = req.user.user._id; //grab the user's id from the session cookie
+    const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
   
     //grab a random starter pet from the template and add which user it belongs to
     const firstPet = getStarterPet();
@@ -106,7 +106,7 @@ module.exports = {
     }, { new: true })
         .populate('pets', { dna: 0 })
         .populate('eggs', { dna: 0 });
-  
+    console.log("updated users results" + updatedUserResult)
     res.json(updatedUserResult);
   },
 

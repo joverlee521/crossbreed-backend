@@ -17,11 +17,11 @@ const asyncMiddleWare = require('../middleware/async');
 router.post(
 	'/login',
 	function (req, res, next) {
-		passport.authenticate('local', function(err, user, info) {
+		passport.authenticate('local', function (err, user, info) {
 			if (err) { return res.status(500).json(err) }
-			if (!user) { return res.status(403).json( { message: info.message }) }
+			if (!user) { return res.status(403).json({ message: info.message }) }
 			req.login(user, (err) => {
-				if(err){
+				if (err) {
 					return res.status(500).json(err);
 				}
 				next();
@@ -46,42 +46,35 @@ router.post('/logout', (req, res) => {
 router.post('/login/google', (req, res, next) => {
 	console.log("beep" + JSON.stringify(req.body))
 	const { id, givenName } = req.body;
-	User.findOneAndUpdate({ 'google.googleId': id }, { $set: { 'displayName': givenName } }, { upsert: true, new: true }, (err, user) => {
-		
-		console.log("purple mountain"+ user)
-    if (err) return res.json("blue mountain" + err);
-		// return res.json(
-		// 	{
-		// 		_id: user._id,
-		// 		displayName: user.displayName,
-		// 		pets: user.pets,
-		// 		eggs: user.eggs
-		// 	}
-    // )
-    //AP: instead of returning user as above, you would instead do:
-    const userObj = {
-      _id: user._id,
-	  displayName: user.displayName,
-	  pets: user.pets,
-	  eggs: user.eggs
-    }
-    req.login(userObj, function(err) { //AP: req.login is available in passport; it's not an express function
-      if (err) {
-		console.log('Hit some error ', err);
-		return res.status(307)
-      } else {
-        next();
-      }
-    })
-		// next(); => AP: Moved next function call above
+	//findone if doesnt exist, then create 
+	User.findOne({ 'google.googleId': id }, (err, user) => {
+		if (user) {
+			return user
+		}
+		User.create({ 'google.googleId': id }, { $setOnInsert: { 'displayName': givenName, status: true, userNum: 1 } }, { upsert: true, new: true }, (err, user) => {
 
+			console.log("purple mountain" + user)
+			if (err) return res.json("blue mountain" + err);
+
+			const userObj = {
+				_id: user._id,
+				displayName: user.displayName,
+				pets: user.pets,
+				eggs: user.eggs
+			}
+
+			req.login(userObj, function (err) { //AP: req.login is available in passport; it's not an express function
+				if (err) {
+					console.log('Hit some error ', err);
+					return res.status(307)
+				} else {
+					next();
+				}
+			})
+		})
+		asyncMiddleWare(petController.createStarterPet)
 	})
 },
-
-  // passport.authenticate('google'), asyncMiddleWare(petController.createStarterPet)
-  // AP: Since we are forcing passport session with req.login, we can skip passport.authenticate here and straight call the createStarterPet function
-  asyncMiddleWare(petController.createStarterPet)
-
 )
 
 router.post(

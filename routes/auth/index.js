@@ -61,9 +61,9 @@ router.post('/login/google', (req, res, next) => {
     //AP: instead of returning user as above, you would instead do:
     const userObj = {
       _id: user._id,
-	  displayName: user.displayName,
-	  pets: user.pets,
-	  eggs: user.eggs
+	  displayName: user.displayName
+	//   pets: user.pets,
+	//   eggs: user.eggs
     }
     req.login(userObj, function(err) { //AP: req.login is available in passport; it's not an express function
       if (err) {

@@ -33,4 +33,26 @@ router.get("/:difficulty", function(req, res){
     })
 });
 
+router.get("/details/:word", function(req, res){
+    const word = req.params.word;
+    const queryURL = `https://wordsapiv1.p.rapidapi.com/words/${word}`;
+    const options = {
+        method: "GET",
+        url: queryURL,
+        headers: {
+            "X-RapidAPI-Key": API_KEY,
+            "Accept": "application/json"
+        }
+    }
+    request(options, function(error,response, body){
+        if(error){
+            console.log(error);
+        }
+        else if(!error && response.statusCode === 200){
+            body = JSON.parse(body);
+            res.json(body);
+        }
+    })
+})
+
 module.exports = router;

@@ -5,30 +5,22 @@ const API_KEY = process.env.API_KEY;
 
 router.get("/:difficulty", function(req, res){
     const difficulty = req.params.difficulty;
-    let minLetters = 0;
-    let maxLetters = 0;
+    let wordLength = "";
     switch(difficulty){
         case "easy":
-            minLetters = 4;
-            maxLetters = 5;
+            wordLength = "????????"
             break;
         case "normal":
-            minLetters = 5;
-            maxLetters = 8;
+            wordLength = "??????"
             break;
         case "hard":
-            minLetters = 2;
-            maxLetters = 3;
+            wordLength = "????"
             break;
     }
-    const queryURL = `https://wordsapiv1.p.rapidapi.com/words/?hasDetails=typeOf,synonyms&letterPattern=^[a-z]*$&lettersMin=${minLetters}&lettersMax=${maxLetters}&random=true`;
+    const queryURL = ` https://api.datamuse.com/words?sp=${wordLength}&ml=animals&v=enwiki&max=100`;
     const options = {
         method: "GET",
         url: queryURL,
-        headers: {
-            "X-RapidAPI-Key": API_KEY,
-            "Accept": "application/json"
-        }
     }
     request(options, function(error, response, body){
         if(error) {

@@ -1,9 +1,5 @@
-//(TO-DO) REFACTOR THE PET CONTROLLER TO HANDLE AUTH
-//USER MUST BE AUTHENTICATED IN ORDER TO CREATE EGGS, UPDATE EGGS, DELETE EGGS
-//(but anyone can get EGGS)
-
 const db = require("../db/models");
-const Egg = require("../scripts/createEggs");
+const Egg = require("../scripts/classes/egg");
 const moment = require("moment");
 
 module.exports = {
@@ -40,9 +36,6 @@ module.exports = {
         }
         const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-        console.log("INCOMING RENTS");
-        console.log(req.body.firstParent);
-        console.log(req.body.secondParent);
         //make sure we have at least two distinct parent IDs
         if ((!req.body.firstParent && !req.body.secondParent) || (req.body.firstParent === req.body.secondParent)) {
             return res.sendStatus(400);
@@ -61,10 +54,10 @@ module.exports = {
         //Finally!  We can create an egg :)
         let newEgg = {};
         try {
-            newEgg = Egg.createFromParents(dbFirstParent, dbSecondParent);
+            newEgg = new Egg(dbFirstParent, dbSecondParent);
         }
         catch (err) {
-            return res.sendStatus(422); //To do - change this to 500 later
+            return res.sendStatus(500); 
         }
         //now we save the child to the db under this user's name 
         //and update the parents to show they have recently bred

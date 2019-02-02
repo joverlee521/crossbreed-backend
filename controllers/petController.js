@@ -1,6 +1,6 @@
 const db = require("../db/models");
 const getStarterPet = require("../scripts/starterPets");
-const Pet = require("../scripts/hatchEggs");
+const Pet = require('../scripts/classes/pet');
 const calcLevelAndXP = require("../scripts/levelSystem");
 
 module.exports = {
@@ -37,7 +37,7 @@ module.exports = {
 
         //First, look up the egg 
         //(TO-DO) Validate that it has incubated long enough to hatch
-        const eggData = await db.Egg.findOne({ _id: req.body._id, user: loggedInUser, lifeStage: "readyToHatch" }).lean(true);
+        const eggData = await db.Egg.findOne({ _id: req.body._id, user: loggedInUser }).lean(true);
         if (!eggData) {
             return res.sendStatus(404);
         }
@@ -71,18 +71,17 @@ module.exports = {
         }
         const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
-        //grab a random starter pet from the template and add which user it belongs to
-        const firstPet = getStarterPet();
-        firstPet['user'] = loggedInUser;
-
-        const secondPet = getStarterPet();
-        secondPet['user'] = loggedInUser;
+        //grab two random starter pets from the template and add which user it belongs to
+        const randomPets = getStarterPet(2);
+        console.log(randomPets);
+        randomPets[0]['user'] = loggedInUser;
+        randomPets[1]['user'] = loggedInUser;
 
         //save it to the db 
-        const dbSavedPets = await Promise.all(
-            [db.Pet.create(firstPet), db.Pet.create(secondPet)]
-        );
+        //REFACTOR HERE
+        const dbSavedPets = await db.Pet.create(randomPets);
 
+        console.log(dbSavedPets);
         //finally, continue updating the user model with the pets
         const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
             $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id] } }

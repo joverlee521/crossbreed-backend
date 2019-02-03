@@ -1,51 +1,94 @@
 class Pet {
-    //The pet constructor takes in an egg and interprets its dna into a real pet!
+    //The pet constructor takes in an egg and tries to interprets dna into a pet!
     constructor(egg) {
-        //(TO-DO) add better validation with Joi
         this.dna = egg.dna;
         this.parents = egg.parents;
 
         //PHENOTYPE INTERPRETATION 
-        //BASE COLOR
-        //set rgb color values for the base body of the creature
-        this.baseColor = this.determineColor("baseColor");
+        //(the real grubloaf and tubers)
+        //Go through the dna's control genepairs and figure out which ones are dominant
+        const controlGenes = this.dna.controlGenes
+            .map(genePair => this.determineDominance(genePair));
 
-        //OUTLINE COLOR (contrast color)
-        //long-term this could also be gene-controlled 
-        this.outlineColor = this.determineOutlineColor(this.baseColor);
+        //Next, try to execute the methods associated with each control gene
+        controlGenes.forEach(geneToExpress => {
+            if (geneToExpress !== null) {
+                const { rnaMethod, phenotypeKeyName, isCritical } = geneToExpress;
+                this[phenotypeKeyName] = this[rnaMethod](geneToExpress);
 
-        //GAME COLOR
-        //Interpret which color(s) the creature should 'count as' in the game
-        this.gameColor = this.determineGameColor(this.baseColor);
+                //Always validate that the creature we have is viable -
+                //if this gene is critical but we didn't get a phenotype, egg cannot hatch
+                if (isCritical === true && this[phenotypeKeyName] === null) {
+                    throw new Error("Nonviable pet - missing " + phenotypeKeyName);
+                }
+            }
+        });
+
+        //TO-DO: add in Joi for better external validation
+        if (!this.hasOwnProperty('baseColor') || !this.hasOwnProperty('outlineColor') || !this.hasOwnProperty('gameColor')) {
+            throw new Error("Nonviable pet");
+        }
     }
 
-    determineColor(geneGroup) {
-        //EXPECTS the name of a key (on the dna object) which takes
-        const evaluatedColor = {
+    determineRGBA(controlGene) {
+        //INPUT: a control gene 
+        //OUTPUT: an rgba color object in the format { red: 255, green: 255, blue: 255, transparency: 1}
+
+        //IF we do not have valid info -- ex, the startIndex doesn't fit within the bounds of the dna sequence, or the length of the sequence is <1, we should return a null
+        //that is a NONVIABLE color
+        const { startIndex, numGenesToExpress } = controlGene;
+
+        const dnaLength = this.dna.sequence.length;
+        if (startIndex < 0 || startIndex >= dnaLength || numGenesToExpress < 1
+            || (startIndex + numGenesToExpress - 1) >= dnaLength) {
+            return null;
+        }
+
+        //(TO-DO) add genes to interpret the ORDER the bits get set
+        //FOR NOW: it always goes red, green, blue
+        const orderToEvaluate = ["red", "green", "blue"];
+
+        //Extract the portion of the dna that encodes for the colors
+        const colorGenes = this.dna.sequence
+            .slice(startIndex, startIndex + numGenesToExpress)
+            .map(allelePair => this.determineDominance(allelePair));
+
+        //Our default is an ABSENCE of color 
+        const result = {
             red: 0,
             green: 0,
             blue: 0,
             transparency: 1
         };
 
-        //rgba colors have genes for red, green, and blue; transparency is 1 (for now)
-        ["red", "green", "blue"].forEach(color => {
-            //Grab the gene sequence for the current color (red, green, or blue)
-            let currentColor = this.dna[geneGroup][color];
-            //There are gene pairs for each possible bit - we will check what is dominant 
-            [1, 2, 4, 8, 16, 32, 64, 128].forEach(bit => {
-                let winningGene = this.determineDominance(currentColor[bit]);
-                evaluatedColor[color] += (winningGene.value ? bit : 0);
-            });
-        });
+        //Run through adding powers of two to the result
+        let colorIndex = 0;
+        const bits = [1, 2, 4, 8, 16, 32, 64, 128];
+        let bit = 0;
 
-        return evaluatedColor;
+        for (let i = 0; i < colorGenes.length && colorIndex < 3; i++) {
+            let color = orderToEvaluate[colorIndex];
+            result[color] += (colorGenes[i].value === 1 ? bits[bit] : 0);
+            bit++;
+            if (bit > 7) { //(TO-DO: think about buffer overflows)
+                bit = 0;
+                colorIndex += 1;
+            }
+        }
+
+        return result;
     }
 
-    determineOutlineColor(color) {
+    determineContrast(controlGene) {
         //This looks at an existing color and determines if a constrast color should be black or white 
+
+        const color = this.resolveSingleReference(controlGene);
+        if (!color) {
+            return null;
+        }
+
         //The below algorithm comes from the w3c standard for accessibility 
-        //First, we convert the rgb value for each color into its contrast value
+        //First, we convert the rgb value for each color into its contrast value 
         const contrasts = [color.red, color.green, color.blue].map(currentColor => {
             let currentContrast = currentColor / 255.0;
             if (currentContrast <= 0.03928) {
@@ -56,6 +99,7 @@ class Pet {
             }
             return currentContrast;
         });
+
         //now we use that contrast to calculate an overall luminosity:
         const luminosity = 0.2126 * contrasts[0] + 0.7152 * contrasts[1] + 0.0722 * contrasts[2];
         if (luminosity > 0.179) {
@@ -77,14 +121,16 @@ class Pet {
         }
     }
 
-    determineGameColor(rgbColor) {
-        //(TO-DO) Math this out for game balance to understand the projected distribution of game colors
-        //RETHINK THIS:
-        //Maybe you get 'points' toward each of the possible game colors, based on different checks you pass (or fail)
-        //At the end, return the two with the most 'points'
-        //If only one category gets 'votes'?  that becomes both primary and secondary?
-        const { red, green, blue } = rgbColor;
+    //determineGameColor
+    //INPUT: takes a control gene with a reference to the color we should use to determine game color
+    //OUTPUT: an object containing the primary and secondary 'effective colors' that we use in minigames  (ex: { primary: "black", secondary: "white"})
+    determineGameColor(controlGene) {
+        const rgbColor = this.resolveSingleReference(controlGene);
+        if (!rgbColor) {
+            return null;
+        }
 
+        const { red, green, blue } = rgbColor;
         //First, we attack the low hanging fruit -- 'pure' colors
         //If all RGB are 32 or under?  BLACK/BLACK
         if (red <= 32 && green <= 32 && blue <= 32) {
@@ -175,9 +221,79 @@ class Pet {
         return result;
     }
 
+    determineInteger(controlGene) {
+        //INPUT: a control gene
+        //OUTPUT: a zero or positive integer value (based on the # of bits in the gene sequence)
+        const { startIndex, numGenesToExpress } = controlGene;
+
+        //sanity check that we have enough genes to read
+        const dnaLength = this.dna.sequence.length;
+        if (startIndex < 0 || startIndex >= dnaLength || numGenesToExpress < 1
+            || (startIndex + numGenesToExpress - 1) >= dnaLength) {
+            return null;
+        }
+
+        //since we have a valid sequence, iterate over it to interpret the number
+        //numbers are encoded as powers of 2, starting at 2^0 and moving higher 
+        
+        const numberGenes = this.dna.sequence
+            .slice(startIndex,  startIndex + numGenesToExpress)
+            .map(eachGenePair => this.determineDominance(eachGenePair));
+
+        let resultNum = 0;
+        let bit = 0;
+        numberGenes.forEach(gene => {
+            resultNum += (gene.value === 1 ? Math.pow(2, bit) : 0);
+            bit+=1;
+        });
+
+        return resultNum;
+    }
+
+    //INPUT: a control gene (which is expected to have a populated 'references' array)
+    //OUTPUT: either null (if reference could not be resolved) OR the expect result
+    resolveSingleReference(controlGene) {
+        //First, fail the lookup if there's either no references, or too many 
+        if (!controlGene.references || controlGene.references.length > 1) {
+            return null;
+        }
+
+        //Next, check if the reference applies to a phenotype key (which is preferred)
+        const soloSource = controlGene.references[0];
+        if (this.hasOwnProperty(soloSource)) {
+            return this[soloSource];
+        }
+        //otherwise, we attempt to look up the reference in the control gene sequence
+        //and then interpret using THAT control gene :)
+        else {
+            const referencePair = this.dna.controlGenes
+                .filter(genePair =>
+                    genePair[0].controlGeneKeyName === soloSource ||
+                    genePair[1].controlGeneKeyName === soloSource);
+
+            if (!referencePair || referencePair.length !== 1) {
+                return null;
+            }
+            const referenceToExpress = this.determineDominance(referencePair[0]);
+            return this[referenceToExpress.rnaMethod](referenceToExpress);
+        }
+    }
+
     determineDominance(gene) {
         const firstAllele = gene[0];
         const secondAllele = gene[1];
+        //GENETIC ILLNESS handling!
+        //Will have a 50/50 chance of madness here
+        if (firstAllele === null || secondAllele === null) {
+            if (firstAllele === null && secondAllele.isDominant) {
+                return secondAllele;
+            }
+            else if (secondAllele === null && firstAllele.isDominant) {
+                return firstAllele;
+            }
+            return null;
+        }
+
         //If one is dominant but not the other, return that
         if (firstAllele.isDominant && !secondAllele.isDominant) {
             return firstAllele;

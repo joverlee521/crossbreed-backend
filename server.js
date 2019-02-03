@@ -70,8 +70,9 @@ app.get(
 		failureRedirect: 'https://crossbreed-backend.herokuapp.com/login'
 	})
 ) 
-//password reset 
 
+
+//password reset 
 app.post('/forgot', function(req, res, next) {
 	console.log("testing forgot route " +  JSON.stringify(req.body))
 	const object1 = req.body

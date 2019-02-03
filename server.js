@@ -16,7 +16,9 @@ const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('./db/models/user');
-var sgTransport = require('../src/sendgrid-transport.js');
+const sgTransport = require('nodemailer-sendgrid-transport');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
 
 
 
@@ -106,30 +108,56 @@ app.post('/forgot', function(req, res, next) {
         });
       },
       function(token, user, done) {
-        var smtpTransport = nodemailer.createTransport('SMTP', {
-          service: 'SendGrid',
-          auth: {
-            user: 'kimmykablitz',
-            pass: 'Xuandieu1'
-          }
-        });
-        var mailOptions = {
-          to: user.local.email,
-          from: 'izumi199@yahoo.com',
-          subject: 'Your crossbreed account user password reset',
-          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-        };
-        smtpTransport.sendMail(mailOptions, function(err) {
-          req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-          done(err, 'done');
-        });
+        // var smtpTransport = nodemailer.createTransport('SMTP', {
+        //   service: 'SendGrid',
+        //   auth: {
+        //     user: 'kimmykablitz',
+        //     pass: 'Xuandieu1'
+        //   }
+		// });
+		// var options = {
+		// 	auth: {
+		// 		api_user: kimmykablitz,
+		// 		api_key: Xuandieu1
+		// 	}
+		// }
+		// var mailer = nodemailer.createTransport(sgTransport(options));
+
+        // var mailOptions = {
+        //   to: user.local.email,
+        //   from: 'izumi199@yahoo.com',
+        //   subject: 'Your crossbreed account user password reset',
+        //   text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+        //     'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+        //     'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+        //     'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+		// };
+		var mailOptions = {
+			to: user.local.email,
+			from: 'kim.tran549@gmail.com',
+			subject: 'Your crossbreed account user password reset',
+			text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			  'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			  'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+			  'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+		  };
+
+        // smtpTransport.sendMail(mailOptions, function(err) {
+        //   req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+        //   done(err, 'done');
+		// });
+		// sgMail.send(mailOptions, function(err, res) {
+		// 	if (err) { 
+		// 		console.log(err) 
+		// 	}
+		// 	console.log(res);
+		// });
+		sgMail.send(mailOptions);
       }
     ], function(err) {
-      if (err) return next(err);
-    //   res.redirect('/forgot');
+    //   if (err) return next(err);
+	//   res.redirect('/forgot');
+	if(err) return err
     });
   });
 

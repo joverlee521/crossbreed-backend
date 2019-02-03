@@ -15,6 +15,7 @@ const bcrypt = require('bcrypt-nodejs');
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const User = require('./db/models/user');
 
 
 // ===== Middleware ====
@@ -65,6 +66,66 @@ app.get(
 		failureRedirect: 'https://crossbreed-backend.herokuapp.com/login'
 	})
 ) 
+//password reset 
+
+app.post('/forgot', function(req, res, next) {
+	console.log("testing forgot route " +  JSON.stringify(req.body))
+	const email = req.body;
+    async.waterfall([
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOne({ 'local.email': email }, function(err, user) {
+        //   if (!user) {
+        //     req.flash('error', 'No account with that email address exists.');
+        //     return res.redirect('/forgot');
+		//   }
+		if (err) return res.json("blue mountain" + err);
+
+		const userEmailObj = {
+			'local.email': user.email,
+			'local.resetPasswordToken': token,
+			'local.resetPasswordExpires' : Date.now() + 3600000
+		}
+        //   user.resetPasswordToken = token;
+        //   user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  
+          userEmailObj.save(function(err) {
+            done(err, token, user);
+          });
+        });
+      },
+      function(token, user, done) {
+        var smtpTransport = nodemailer.createTransport('SMTP', {
+          service: 'SendGrid',
+          auth: {
+            user: '!!! YOUR SENDGRID USERNAME !!!',
+            pass: '!!! YOUR SENDGRID PASSWORD !!!'
+          }
+        });
+        var mailOptions = {
+          to: user.email,
+          from: 'izumi199@yahoo.com',
+          subject: 'Your crossbreed account user password reset',
+          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+        };
+        smtpTransport.sendMail(mailOptions, function(err) {
+          req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+          done(err, 'done');
+        });
+      }
+    ], function(err) {
+      if (err) return next(err);
+      res.redirect('/forgot');
+    });
+  });
 
 /* Express app ROUTING */
 const routes = require('./routes');

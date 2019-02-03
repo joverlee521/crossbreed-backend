@@ -16,6 +16,8 @@ const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('./db/models/user');
+var sgTransport = require('../src/sendgrid-transport.js');
+
 
 
 // ===== Middleware ====
@@ -70,7 +72,10 @@ app.get(
 
 app.post('/forgot', function(req, res, next) {
 	console.log("testing forgot route " +  JSON.stringify(req.body))
-	const email = req.body;
+	const object1 = req.body
+	// const {email, thatEmptyString }= req.body;
+	const email = Object.keys(object1)
+
     async.waterfall([
       function(done) {
         crypto.randomBytes(20, function(err, buf) {
@@ -84,17 +89,18 @@ app.post('/forgot', function(req, res, next) {
         //     req.flash('error', 'No account with that email address exists.');
         //     return res.redirect('/forgot');
 		//   }
+		console.log("before blue mountain " +user)
 		if (err) return res.json("blue mountain" + err);
 
-		const userEmailObj = {
-			'local.email': user.email,
-			'local.resetPasswordToken': token,
-			'local.resetPasswordExpires' : Date.now() + 3600000
-		}
-        //   user.resetPasswordToken = token;
-        //   user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+		// const userEmailObj = {
+		// 	'local.email': user.email,
+		// 	'local.resetPasswordToken': token,
+		// 	'local.resetPasswordExpires' : Date.now() + 3600000
+		// }
+          user.local.resetPasswordToken = token;
+          user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
   
-          userEmailObj.save(function(err) {
+          user.save(function(err) {
             done(err, token, user);
           });
         });
@@ -103,12 +109,12 @@ app.post('/forgot', function(req, res, next) {
         var smtpTransport = nodemailer.createTransport('SMTP', {
           service: 'SendGrid',
           auth: {
-            user: '!!! YOUR SENDGRID USERNAME !!!',
-            pass: '!!! YOUR SENDGRID PASSWORD !!!'
+            user: 'kimmykablitz',
+            pass: 'Xuandieu1'
           }
         });
         var mailOptions = {
-          to: user.email,
+          to: user.local.email,
           from: 'izumi199@yahoo.com',
           subject: 'Your crossbreed account user password reset',
           text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
@@ -123,7 +129,7 @@ app.post('/forgot', function(req, res, next) {
       }
     ], function(err) {
       if (err) return next(err);
-      res.redirect('/forgot');
+    //   res.redirect('/forgot');
     });
   });
 

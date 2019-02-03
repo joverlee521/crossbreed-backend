@@ -113,11 +113,8 @@ router.post(
 	},
 	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
 )
-//Create the user in the db
 
-//Authenticate the user with passport
 
-//Resolve to the front end with the token
 
 
 module.exports = router;

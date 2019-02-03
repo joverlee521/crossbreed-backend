@@ -11,6 +11,12 @@ const passport = require('./passport')
 const app = express()
 const PORT = process.env.PORT || 3001
 
+const bcrypt = require('bcrypt-nodejs');
+const async = require('async');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
+
 // ===== Middleware ====
 app.use(morgan('dev'))
 app.use(

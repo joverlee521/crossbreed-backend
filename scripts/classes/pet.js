@@ -45,6 +45,14 @@ class Pet {
         if (innerEarColor !== null) {
             result['innerEarColor'] = innerEarColor;
         }
+        else { //otherwise our default is the same color as the blush
+            result['innerEarColor'] = {
+                red: 253,
+                green: 153,
+                blue: 199,
+                transparency: 255
+            };
+        }
         //grab the number of the 
         return result;
     }
@@ -61,7 +69,7 @@ class Pet {
     determineRGBA(controlGene) {
         console.log("Determining rgba color")
         //INPUT: a control gene 
-        //OUTPUT: an rgba color object in the format { red: 255, green: 255, blue: 255, transparency: 1}
+        //OUTPUT: an rgba color object in the format { red: 255, green: 255, blue: 255, transparency: 255}
 
         //IF we do not have valid info -- ex, the startIndex doesn't fit within the bounds of the dna sequence, or the length of the sequence is <1, we should return a null
         //that is a NONVIABLE color
@@ -87,7 +95,7 @@ class Pet {
             red: 0,
             green: 0,
             blue: 0,
-            transparency: 1
+            transparency: 255
         };
 
         //Run through adding powers of two to the result
@@ -138,7 +146,7 @@ class Pet {
                 red: 0,
                 green: 0,
                 blue: 0,
-                transparency: 1
+                transparency: 255
             };
         }
         else { //otherwise, use white as a contrast
@@ -146,7 +154,7 @@ class Pet {
                 red: 255,
                 green: 255,
                 blue: 255,
-                transparency: 1
+                transparency: 255
             };
         }
     }

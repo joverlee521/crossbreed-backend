@@ -46,6 +46,18 @@ const petSchema = new mongoose.Schema({
     baseColor: {},
     outlineColor: {},
     gameColor: {},
+    ears: {
+        type: Object,
+        default: null
+    },
+    antennae: {
+        type: Object,
+        default: null
+    },
+    extraGuesses: {
+        type: Number,
+        default: 0
+    },
     parents: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Pet'

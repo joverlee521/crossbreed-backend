@@ -11,6 +11,17 @@ const passport = require('./passport')
 const app = express()
 const PORT = process.env.PORT || 3001
 
+const bcrypt = require('bcrypt-nodejs');
+const async = require('async');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const User = require('./db/models/user');
+const sgTransport = require('nodemailer-sendgrid-transport');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+const MY_PASSWORD = process.env.MY_PASSWORD
+
+
 // ===== Middleware ====
 app.use(morgan('dev'))
 app.use(
@@ -47,7 +58,7 @@ app.use(function(req, res, next) {
 	next()
 })
 // testing
-/* app.get(
+app.get(
 	'/auth/google/callback',
 	(req, res, next) => {
 		console.log(`req.user: ${req.user}`)
@@ -55,10 +66,70 @@ app.use(function(req, res, next) {
 		next()
 	},
 	passport.authenticate('google', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: 'http://localhost:3000/login'
+		successRedirect: 'https://crossbreed-backend.herokuapp.com',
+		failureRedirect: 'https://crossbreed-backend.herokuapp.com/login'
 	})
-) */
+) 
+
+
+//password reset 
+app.post('/forgot', function(req, res, next) {
+	console.log("testing forgot route " +  JSON.stringify(req.body))
+	const object1 = req.body
+	const email = Object.keys(object1)
+
+    async.waterfall([
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOne({ 'local.email': email }, function(err, user) {
+
+		console.log("before blue mountain " +user)
+		if (err) return res.json("blue mountain" + err);
+
+          user.local.resetPasswordToken = token;
+          user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  
+          user.save(function(err) {
+            done(err, token, user);
+          });
+        });
+      },
+      function(token, user, done) {
+		var transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				   user: 'kimiboo55@gmail.com',
+				   pass: MY_PASSWORD
+			   }
+		   });
+
+		var mailOptions = {
+			to: user.local.email,
+			from: 'kim.tran549@gmail.com',
+			subject: 'Your crossbreed account user password reset',
+			text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			  'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			  'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+			  'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+		  };
+
+
+		transporter.sendMail(mailOptions, function (err, info) {
+			if(err)
+			  console.log(err)
+			else
+			  console.log(info);
+		 });
+      }
+    ], function(err) {
+	if(err) return err
+    });
+  });
 
 /* Express app ROUTING */
 const routes = require('./routes');
@@ -71,7 +142,6 @@ app.use(function(err, req, res, next) {
 	res.status(500)
 })
 
-// ==== Starting Server =====
 app.listen(PORT, () => {
 	console.log(`App listening on PORT: ${PORT}`)
 })

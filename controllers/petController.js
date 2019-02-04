@@ -1,6 +1,6 @@
 const db = require("../db/models");
 const getStarterPet = require("../scripts/starterPets");
-const Pet = require("../scripts/hatchEggs");
+const Pet = require('../scripts/classes/pet');
 const calcLevelAndXP = require("../scripts/levelSystem");
 
 module.exports = {
@@ -88,25 +88,21 @@ module.exports = {
     }
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
   
-    //grab a random starter pet from the template and add which user it belongs to
-    const firstPet = getStarterPet();
-    firstPet['user'] = loggedInUser;
-  
-    const secondPet = getStarterPet();
-    secondPet['user'] = loggedInUser;
-  
-    //save it to the db 
-    const dbSavedPets = await Promise.all(
-        [db.Pet.create(firstPet), db.Pet.create(secondPet)]
-    );
-  
+    //grab two random starter pets from the template and add which user it belongs to
+    const randomPets = getStarterPet(2);
+    randomPets[0]['user'] = loggedInUser;
+    randomPets[1]['user'] = loggedInUser;
+
+    //save the pets to the db 
+    const dbSavedPets = await db.Pet.create(randomPets);
+
     //finally, continue updating the user model with the pets
     const updatedUserResult = await db.User.findByIdAndUpdate(loggedInUser, {
         $push: { pets: { $each: [dbSavedPets[0]._id, dbSavedPets[1]._id] } }
     }, { new: true })
         .populate('pets', { dna: 0 })
         .populate('eggs', { dna: 0 });
-    console.log("updated users results" + updatedUserResult)
+
     res.json(updatedUserResult);
   },
 

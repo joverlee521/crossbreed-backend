@@ -35,7 +35,6 @@ class Pet {
 
     //APPEARANCE RELATED GENES
     determineEars(controlGene) {
-        console.log("Determining ears");
         const result = {
             type: "basic"
         }
@@ -58,8 +57,7 @@ class Pet {
     }
 
     determineAntennae(controlGene) {
-        console.log("Determining antennae");
-        //grab the number of the 
+        //grab the number that this gene refers to
         return {
             type: "basic"
         };
@@ -67,7 +65,6 @@ class Pet {
 
     //COLOR RELATED GENES
     determineRGBA(controlGene) {
-        console.log("Determining rgba color")
         //INPUT: a control gene 
         //OUTPUT: an rgba color object in the format { red: 255, green: 255, blue: 255, transparency: 255}
 
@@ -117,7 +114,6 @@ class Pet {
     }
 
     determineContrast(controlGene) {
-        console.log("Determining contrast");
         //This looks at an existing color and determines if a constrast color should be black or white 
 
         const color = this.resolveSingleReference(controlGene);
@@ -163,7 +159,6 @@ class Pet {
     //INPUT: takes a control gene with a reference to the color we should use to determine game color
     //OUTPUT: an object containing the primary and secondary 'effective colors' that we use in minigames  (ex: { primary: "black", secondary: "white"})
     determineGameColor(controlGene) {
-        console.log("Determining game color");
         const rgbColor = this.resolveSingleReference(controlGene);
         if (!rgbColor) {
             return null;
@@ -261,7 +256,6 @@ class Pet {
     }
 
     determineInteger(controlGene) {
-        console.log("Determining an integer");
         //INPUT: a control gene
         //OUTPUT: a zero or positive integer value (based on the # of bits in the gene sequence)
         const { startIndex, numGenesToExpress } = controlGene;
@@ -294,7 +288,6 @@ class Pet {
     //INPUT: a control gene (which is expected to have a populated 'references' array)
     //OUTPUT: either null, or an array containing the results of the populations
     /*     resolveReferences(controlGene) {
-            console.log("Resolving one or more references");
             //First, fail the lookup if there's no references
             if (!controlGene.references || controlGene.references.length < 1) {
                 return null;
@@ -311,7 +304,6 @@ class Pet {
     //INPUT: a control gene (which is expected to have a populated 'references' array)
     //OUTPUT: either null (if reference could not be resolved) OR the expect result
     resolveSingleReference(controlGene) {
-        console.log("Resolving a single reference");
         //First, fail the lookup if there's either no references, or too many 
         if (!controlGene.references || controlGene.references.length > 1) {
             return null;

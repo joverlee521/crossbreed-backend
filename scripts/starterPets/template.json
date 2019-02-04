@@ -145,240 +145,240 @@
             ]
         ],
         "sequence": [
-            [ 
+            [ //red 1 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
                 },
                 {
-                    "value": 1,
-                    "isDominant": false
+                    "value": 0,
+                    "isDominant": true
                 }
             ], 
-            [ 
+            [ //red 2 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
                 },
                 {
-                    "value": 1,
-                    "isDominant": false
+                    "value": 0,
+                    "isDominant": true
                 }
             ], 
-            [
+            [//red 4 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
                 },
                 {
-                    "value": 1,
-                    "isDominant": false
+                    "value": 0,
+                    "isDominant": true
                 }
             ],
-            [ 
+            [ //red 8
                 {
-                    "value": 1,
-                    "isDominant": true
+                    "value": 0,
+                    "isDominant": false
                 },
                 {
                     "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [ //red 16
                 {
-                    "value": 1,
-                    "isDominant": true
+                    "value": 0,
+                    "isDominant": false
                 },
                 {
                     "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [ //red 32 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
                 },
                 {
-                    "value": 1,
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //red 64 
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [ //red 128 (high is RECESSIVE)
                 {
-                    "value": 1,
+                    "value": 0,
                     "isDominant": true
                 },
                 {
                     "value": 1,
+                    "isDominant": false
+                }
+            ],
+            [ //green 1 (HIGH IS RECESSIVE)
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
                     "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
                 }
             ], 
-            [ 
+            [ //green 2 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
                 },
                 {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
+                    "value": 0,
                     "isDominant": true
+                }
+            ],
+            [ //green 4 (HIGH IS RECESSIVE)
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //green 8
+                {
+                    "value": 0,
+                    "isDominant": false
                 },
                 {
                     "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [ //green 16
                 {
-                    "value": 1,
-                    "isDominant": true
-                },
-                {
-                    "value": 1,
-                    "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
+                    "value": 0,
                     "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": true
-                },
-                {
-                    "value": 1,
-                    "isDominant": true
-                }
-            ],
-            [  
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": true
                 },
                 {
                     "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [ //green 32 (HIGH IS RECESSIVE)
                 {
                     "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
                     "isDominant": true
+                }
+            ],
+            [ //green 64
+                {
+                    "value": 0,
+                    "isDominant": false
                 },
                 {
                     "value": 0,
                     "isDominant": false
                 }
             ],
-            [ 
+            [  //green 128 (high is RECESSIVE)
                 {
-                    "value": 1,
-                    "isDominant": false
+                    "value": 0,
+                    "isDominant": true
                 },
                 {
                     "value": 1,
                     "isDominant": false
                 }
             ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": true
-                },
-                {
-                    "value": 1,
-                    "isDominant": true
-                }
-            ],
-            [  
+            [ //blue 1 (high is RECESSIVE)
                 {
                     "value": 1,
                     "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //blue 2 (high is RECESSIVE)
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //blue 4 (high is RECESSIVE)
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //blue 8
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [ //blue 16
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [ //blue 32 (high is RECESSIVE)
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ //blue 64 
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [  //blue 128 (high is RECESSIVE)
+                {
+                    "value": 0,
+                    "isDominant": true
                 },
                 {
                     "value": 1,

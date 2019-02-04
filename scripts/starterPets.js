@@ -5,6 +5,7 @@ const blackPet = require('./starterPets/blackPet.json');
 const whitePet = require('./starterPets/whitePet.json');
 
 //getRandomStarter
+
 //Takes an OPTIONAL parameter of how many starters to return (default is 2)
 //Returns an array with the requested # of pets
 function getRandomStarter(numPets = 2) {

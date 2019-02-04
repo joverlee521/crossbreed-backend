@@ -1,215 +1,26 @@
 //STARTER PET TEMPLATES
 //When starting the game, users can currently receive pets from a selection of eight pre-defined 'starter' pets 
+const Pet = require('../scripts/classes/pet');
+const blackPet = require('./starterPets/blackPet.json');
+const whitePet = require('./starterPets/whitePet.json');
 
-const Pet = require('./hatchEggs.js');
+const starterPetEggs = [blackPet, whitePet];
 
-const starterPets = [
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 0,
-                isDominant: false
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 0,
-                isDominant: false
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 1,
-                isDominant: true
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 0,
-                isDominant: false
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 1,
-                isDominant: true
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 1,
-                isDominant: true
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 1,
-                isDominant: true
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 1,
-                isDominant: false
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
-    },
-    {
-        dna: {
-            baseColorBlue: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }],
-            baseColorGreen: [{
-                value: 0,
-                isDominant: false
-            }, {
-                value: 0,
-                isDominant: false
-            }],
-            baseColorRed: [{
-                value: 0,
-                isDominant: true
-            }, {
-                value: 1,
-                isDominant: false
-            }]
-        }
+//Takes an OPTIONAL parameter of how many starters to return (default is 2)
+//Returns an array with the requested # of pets
+function getRandomStarter(numPets = 2) {
+    if (numPets > starterPetEggs.length || numPets <= 0) {
+        throw new Error("Requested an invalid number of starter pets");
     }
-];
 
-function getRandomStarter() {
-    //return a random one of the possible starters
-    const randomIndex = Math.floor(Math.random() * starterPets.length);
-    return new Pet(starterPets[randomIndex]).toObj();
+    const petResults = [];
+
+    for (let i = 0; i < numPets; i++) {
+        let randomIndex = Math.floor(Math.random() * starterPetEggs.length);
+        let randomPet = new Pet(starterPetEggs.splice(randomIndex, 1)[0]);
+        petResults.push(randomPet);
+    }
+    return petResults;
 }
 
 module.exports = getRandomStarter;

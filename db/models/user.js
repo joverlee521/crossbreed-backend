@@ -5,10 +5,13 @@ mongoose.promise = Promise
 
 // Define userSchema
 const userSchema = new Schema({
-  displayName: { type: String, unique: true, required: true },
+  displayName: { type: String, required: true },
   local: { //if using username/password
 		username: { type: String, unique: true, required: false, sparse: true },
-		password: { type: String, unique: false, required: false }
+		password: { type: String, unique: false, required: false },
+		email:{ type: String, unique: true, required: false },
+		resetPasswordToken: String,
+		resetPasswordExpires: Date,
   },
   google: { //if using google auth
 	  googleId: { type: String, unique: true, sparse: true, required: false }

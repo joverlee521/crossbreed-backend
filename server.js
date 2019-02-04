@@ -70,8 +70,9 @@ app.get(
 		failureRedirect: 'https://crossbreed-backend.herokuapp.com/login'
 	})
 ) 
-//password reset 
 
+
+//password reset 
 app.post('/forgot', function(req, res, next) {
 	console.log("testing forgot route " +  JSON.stringify(req.body))
 	const object1 = req.body
@@ -102,7 +103,7 @@ app.post('/forgot', function(req, res, next) {
 		var transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {
-				   user: 'kim.tran549@gmail.com',
+				   user: 'kimiboo55@gmail.com',
 				   pass: MY_PASSWORD
 			   }
 		   });

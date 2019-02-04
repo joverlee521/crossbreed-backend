@@ -35,12 +35,26 @@ class Pet {
 
     //APPEARANCE RELATED GENES
     determineEars(controlGene) {
-        const result = {
-            type: "basic"
+        //INPUT: a controlgene
+        //OUTPUT: either null (for no ears) or an object with ear type, and color for inner ear 
+        //ear genes assume that there is an integer which maps to an ear phenotype
+
+        const possibleEarTypes = {
+            '1': 'basic'
         }
-        //if there's an inner ear color, grab that 
-        //otherwise, the inner ear color is null
+
+        const whichEar = this.determineInteger(controlGene);
+
+        if(whichEar===null || !possibleEarTypes.hasOwnProperty(whichEar)) {
+            return null;
+        }
+
+        const result = {
+            type: possibleEarTypes[whichEar.toString()]
+        }
+        //next, if there's an inner ear color referenced by genes, grab that
         const innerEarColor = this.resolveSingleReference(controlGene);
+
         if (innerEarColor !== null) {
             result['innerEarColor'] = innerEarColor;
         }
@@ -52,15 +66,29 @@ class Pet {
                 transparency: 255
             };
         }
-        //grab the number of the 
+        //finally, return the result
         return result;
     }
 
     determineAntennae(controlGene) {
-        //grab the number that this gene refers to
-        return {
-            type: "basic"
-        };
+        //INPUT: a controlgene
+        //OUTPUT: either null (for total failure) or an object with antennae type
+        const possibleAntennaeTypes = {
+            '3': 'basic'
+        }
+
+        const whichAntennae = this.determineInteger(controlGene);
+
+        
+        if(whichAntennae===null || !possibleAntennaeTypes.hasOwnProperty(whichAntennae)) {
+            return null;
+        }
+
+        const result = {
+            type: possibleAntennaeTypes[whichAntennae.toString()]
+        }
+
+        return result;
     }
 
     //COLOR RELATED GENES
@@ -257,16 +285,16 @@ class Pet {
 
     determineInteger(controlGene) {
         //INPUT: a control gene
-        //OUTPUT: a zero or positive integer value (based on the # of bits in the gene sequence)
+        //OUTPUT: a zero or positive integer value (based on the # of bits in the gene sequence) 
         const { startIndex, numGenesToExpress } = controlGene;
-
+     
         //sanity check that we have enough genes to read
         const dnaLength = this.dna.sequence.length;
         if (startIndex < 0 || startIndex >= dnaLength || numGenesToExpress < 1
             || (startIndex + numGenesToExpress - 1) >= dnaLength) {
             return null;
         }
-
+        
         //since we have a valid sequence, iterate over it to interpret the number
         //numbers are encoded as powers of 2, starting at 2^0 and moving higher 
 
@@ -274,13 +302,14 @@ class Pet {
             .slice(startIndex, startIndex + numGenesToExpress)
             .map(eachGenePair => this.determineDominance(eachGenePair));
 
+
         let resultNum = 0;
         let bit = 0;
         numberGenes.forEach(gene => {
             resultNum += (gene.value === 1 ? Math.pow(2, bit) : 0);
             bit += 1;
         });
-
+        
         return resultNum;
     }
 

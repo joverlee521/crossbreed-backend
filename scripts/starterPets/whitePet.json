@@ -130,7 +130,7 @@
                     "isCritical": false,
                     "rnaMethod": "determineAntennae",
                     "startIndex": 29,
-                    "numGenesToExpress": 1
+                    "numGenesToExpress": 2
                 },
                 {
                     "isDominant": true,
@@ -140,7 +140,7 @@
                     "isCritical": false,
                     "rnaMethod": "determineAntennae",
                     "startIndex": 29,
-                    "numGenesToExpress": 1
+                    "numGenesToExpress": 2
                 }
             ]
         ],
@@ -428,7 +428,17 @@
             [
                 {
                     "value": 0,
-                    "isDominant": true
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [
+                {
+                    "value": 1,
+                    "isDominant": false
                 },
                 {
                     "value": 1,
@@ -437,8 +447,8 @@
             ],
             [
                 {
-                    "value": 0,
-                    "isDominant": true
+                    "value": 1,
+                    "isDominant": false
                 },
                 {
                     "value": 1,

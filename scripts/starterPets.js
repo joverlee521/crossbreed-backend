@@ -1,6 +1,5 @@
 //STARTER PET TEMPLATES
 //When starting the game, users can currently receive pets from a selection of eight pre-defined 'starter' pets 
-const fs = require('fs');
 const Pet = require('../scripts/classes/pet');
 const blackPet = require('./starterPets/blackPet.json');
 const whitePet = require('./starterPets/whitePet.json');

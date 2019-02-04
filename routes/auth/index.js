@@ -6,13 +6,7 @@ const userController = require('../../controllers/userController');
 const passport = require('../../passport');
 const asyncMiddleWare = require('../middleware/async');
 
-// router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 
-// router.get('/google/callback',
-// 	passport.authenticate('google', {
-// 		successRedirect: 'http://localhost:3000',
-// 		failureRedirect: 'http://localhost:3000/login'
-// 	}))
 
 router.post(
 	'/login',
@@ -89,7 +83,7 @@ router.post(
 	function (req, res, next) {
 		console.log(req.body)
 		console.log('======INCOMING NEW USER==========')
-		const { username, password, displayName } = req.body
+		const { username, password, displayName, email } = req.body
 		console.log("REQ.BODY: ", req.body)
 		// ADD VALIDATION
 		User.findOne({ 'local.username': username }, (err, userMatch) => {
@@ -101,23 +95,18 @@ router.post(
 			const newUser = new User({
 				'local.username': username,
 				'local.password': password,
+				'local.email':email,
 				displayName
 			})
 			newUser.save((err, savedUser) => {
 				if (err) return res.status(500).json(err);
-
-				//NOTE: make sure we ONLY return the minimum stuff we need to know about the user -- ie, their _id and pets array
 				next();
 			})
 		})
 	},
 	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
 )
-//Create the user in the db
 
-//Authenticate the user with passport
-
-//Resolve to the front end with the token
 
 
 module.exports = router;

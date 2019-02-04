@@ -6,13 +6,24 @@ const userController = require('../../controllers/userController');
 const passport = require('../../passport');
 const asyncMiddleWare = require('../middleware/async');
 
-// router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
+router.get('/google',
+	(req, res, next) => {
+		console.log(`req.user: ${req.user}`)
+		console.log('======= /auth/google/ was called! =====')
+		next()
+	},
+	passport.authenticate('google', { scope: ['profile'] }));
 
-// router.get('/google/callback',
-// 	passport.authenticate('google', {
-// 		successRedirect: 'http://localhost:3000',
-// 		failureRedirect: 'http://localhost:3000/login'
-// 	}))
+router.get('/google/callback',
+	(req, res, next) => {
+		console.log(`req.user: ${req.user}`)
+		console.log('======= /auth/google/callback was called! =====')
+		next()
+	},
+	passport.authenticate('google', {
+		successRedirect: 'http://localhost:3000',
+		failureRedirect: 'http://localhost:3000/login'
+	}));
 
 router.post(
 	'/login',

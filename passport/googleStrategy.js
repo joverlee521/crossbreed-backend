@@ -32,9 +32,7 @@ const strategy = new GoogleStrategy(
 				console.log('====== post save ....')
 				const newGoogleUser = new User({
 					'google.googleId': id,
-					firstName: name.givenName,
-					lastName: name.familyName,
-					photos: photos
+					displayName: name.givenName + " " + name.familyName
 				})
 				// save this user
 				newGoogleUser.save((err, savedUser) => {

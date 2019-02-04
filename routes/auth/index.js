@@ -7,7 +7,6 @@ const passport = require('../../passport');
 const asyncMiddleWare = require('../middleware/async');
 
 
-
 router.post(
 	'/login',
 	function (req, res, next) {

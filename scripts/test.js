@@ -94,6 +94,46 @@ const mom =
                 startIndex: 24,
                 numGenesToExpress: 4
             }],
+            [{
+                isDominant: true,
+                controlGeneKeyName: "ears",
+                phenotypeKeyName: "ears",
+                references: null,
+                isCritical: false,
+                rnaMethod: "determineEars",
+                startIndex: 24,
+                numGenesToExpress: 1
+            },
+            {
+                isDominant: true,
+                controlGeneKeyName: "ears",
+                phenotypeKeyName: "ears",
+                references: ['innerEarColor'],
+                isCritical: false,
+                rnaMethod: "determineEars",
+                startIndex: 24,
+                numGenesToExpress: 1
+            }]/* ,
+            [{
+                isDominant: true,
+                controlGeneKeyName: "innerEarColor",
+                phenotypeKeyName: null, //this is an example of an INTERNAL gene
+                references: ['innerEarColor'],
+                isCritical: false,
+                rnaMethod: "determineRGBA",
+                startIndex: 0,
+                numGenesToExpress: 24
+            }, 
+            {
+                isDominant: true,
+                controlGeneKeyName: "innerEarColor",
+                phenotypeKeyName: null, //this is an example of an INTERNAL gene
+                references:  ['innerEarColor'],
+                isCritical: false,
+                rnaMethod: "determineRGBA",
+                startIndex: 0,
+                numGenesToExpress: 24
+            } ] */
         ],
         sequence: [
             [{
@@ -419,8 +459,82 @@ const dad =
                 startIndex: 24,
                 numGenesToExpress: 4
             }],
+            [{
+                isDominant: true,
+                controlGeneKeyName: "ears",
+                phenotypeKeyName: "ears",
+                references: ['innerEarColor'],
+                isCritical: false,
+                rnaMethod: "determineEars",
+                startIndex: 24,
+                numGenesToExpress: 1
+            },
+            {
+                isDominant: true,
+                controlGeneKeyName: "ears",
+                phenotypeKeyName: "ears",
+                references: ['innerEarColor'],
+                isCritical: false,
+                rnaMethod: "determineEars",
+                startIndex: 24,
+                numGenesToExpress: 1
+            }] ,/*
+            [{
+                isDominant: true,
+                controlGeneKeyName: "innerEarColor",
+                phenotypeKeyName: null, //this is an example of an INTERNAL gene
+                references: null,
+                isCritical: false,
+                rnaMethod: "determineRGBA",
+                startIndex: 0,
+                numGenesToExpress: 24
+            }, 
+            {
+                isDominant: true,
+                controlGeneKeyName: "innerEarColor",
+                phenotypeKeyName: null, //this is an example of an INTERNAL gene
+                references: null,
+                isCritical: false,
+                rnaMethod: "determineRGBA",
+                startIndex: 0,
+                numGenesToExpress: 24
+            } ], */
+            [{
+                isDominant: true,
+                controlGeneKeyName: "antennae",
+                phenotypeKeyName: "antennae",
+                references: null,
+                isCritical: false,
+                rnaMethod: "determineAntennae",
+                startIndex: 28,
+                numGenesToExpress: 1
+            },
+            {
+                isDominant: true,
+                controlGeneKeyName: "antennae",
+                phenotypeKeyName: "antennae",
+                references: null,
+                isCritical: false,
+                rnaMethod: "determineAntennae",
+                startIndex: 28,
+                numGenesToExpress: 1
+            }]
         ],
         sequence: [
+            [{
+                value: 0,
+                isDominant: false
+            }, {
+                value: 0,
+                isDominant: false
+            }],
+            [{
+                value: 0,
+                isDominant: false
+            }, {
+                value: 0,
+                isDominant: false
+            }],
             [{
                 value: 0,
                 isDominant: false
@@ -663,7 +777,8 @@ try {
 
   console.log("Dad's genes: " + dad.dna.controlGenes.length + "  and " + dad.dna.sequence.length);  
   newEgg = new Egg(mom, dad);
-
+  console.log("Made the egg");
+  console.log("Baby's genes: " + newEgg.dna.controlGenes.length + "  and " + newEgg.dna.sequence.length);  
 }
 catch(err) {
     console.log(err.message);
@@ -671,7 +786,29 @@ catch(err) {
 
  try {
     let newPet = new Pet(newEgg);
-    console.log(newPet.baseColor);
+    for(key in newPet) {
+        if(key!=='dna') {
+            if(typeof(newPet[key])==="object") {
+                console.group(key);
+                for(let addlKey in newPet[key]) {
+                    if(typeof(newPet[key][addlKey])==="object") {
+                        console.group(addlKey);
+                        for(let finalKey in newPet[key][addlKey]) {
+                           
+                            console.log(finalKey + ": "+ newPet[key][addlKey][finalKey])
+                            
+                        }
+                        console.groupEnd();
+                    }else {
+                    console.log(addlKey + ": "+ newPet[key][addlKey])}
+                }
+                console.groupEnd();
+            }
+            else {
+            console.log(key + ": " + newPet[key]);
+        }   
+        }
+    }
 }
 catch(err) {
     console.log(err.message);

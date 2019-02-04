@@ -14,23 +14,52 @@ class Pet {
         controlGenes.forEach(geneToExpress => {
             if (geneToExpress !== null) {
                 const { rnaMethod, phenotypeKeyName, isCritical } = geneToExpress;
-                this[phenotypeKeyName] = this[rnaMethod](geneToExpress);
-
-                //Always validate that the creature we have is viable -
-                //if this gene is critical but we didn't get a phenotype, egg cannot hatch
-                if (isCritical === true && this[phenotypeKeyName] === null) {
-                    throw new Error("Nonviable pet - missing " + phenotypeKeyName);
+                if (phenotypeKeyName !== null && rnaMethod !== null) {
+                    this[phenotypeKeyName] = this[rnaMethod](geneToExpress);
+                    //Always validate that the creature we have is viable -
+                    //if this gene is critical but we didn't get a phenotype, egg cannot hatch
+                    if (isCritical === true && this[phenotypeKeyName] === null) {
+                        throw new Error("Nonviable pet - missing " + phenotypeKeyName);
+                    }
                 }
             }
         });
 
-        //TO-DO: add in Joi for better external validation
-        if (!this.hasOwnProperty('baseColor') || !this.hasOwnProperty('outlineColor') || !this.hasOwnProperty('gameColor')) {
+
+        //TO-DO: add in Joi for better validation
+        if (this.baseColor === undefined || this.outlineColor === undefined || this.gameColor === undefined || !this.hasOwnProperty('baseColor') || !this.hasOwnProperty('outlineColor') || !this.hasOwnProperty('gameColor')) {
             throw new Error("Nonviable pet");
         }
+
     }
 
+    //APPEARANCE RELATED GENES
+    determineEars(controlGene) {
+        console.log("Determining ears");
+        const result = {
+            type: "basic"
+        }
+        //if there's an inner ear color, grab that 
+        //otherwise, the inner ear color is null
+        const innerEarColor = this.resolveSingleReference(controlGene);
+        if (innerEarColor !== null) {
+            result['innerEarColor'] = innerEarColor;
+        }
+        //grab the number of the 
+        return result;
+    }
+
+    determineAntennae(controlGene) {
+        console.log("Determining antennae");
+        //grab the number of the 
+        return {
+            type: "basic"
+        };
+    }
+
+    //COLOR RELATED GENES
     determineRGBA(controlGene) {
+        console.log("Determining rgba color")
         //INPUT: a control gene 
         //OUTPUT: an rgba color object in the format { red: 255, green: 255, blue: 255, transparency: 1}
 
@@ -80,6 +109,7 @@ class Pet {
     }
 
     determineContrast(controlGene) {
+        console.log("Determining contrast");
         //This looks at an existing color and determines if a constrast color should be black or white 
 
         const color = this.resolveSingleReference(controlGene);
@@ -125,6 +155,7 @@ class Pet {
     //INPUT: takes a control gene with a reference to the color we should use to determine game color
     //OUTPUT: an object containing the primary and secondary 'effective colors' that we use in minigames  (ex: { primary: "black", secondary: "white"})
     determineGameColor(controlGene) {
+        console.log("Determining game color");
         const rgbColor = this.resolveSingleReference(controlGene);
         if (!rgbColor) {
             return null;
@@ -222,6 +253,7 @@ class Pet {
     }
 
     determineInteger(controlGene) {
+        console.log("Determining an integer");
         //INPUT: a control gene
         //OUTPUT: a zero or positive integer value (based on the # of bits in the gene sequence)
         const { startIndex, numGenesToExpress } = controlGene;
@@ -235,24 +267,43 @@ class Pet {
 
         //since we have a valid sequence, iterate over it to interpret the number
         //numbers are encoded as powers of 2, starting at 2^0 and moving higher 
-        
+
         const numberGenes = this.dna.sequence
-            .slice(startIndex,  startIndex + numGenesToExpress)
+            .slice(startIndex, startIndex + numGenesToExpress)
             .map(eachGenePair => this.determineDominance(eachGenePair));
 
         let resultNum = 0;
         let bit = 0;
         numberGenes.forEach(gene => {
             resultNum += (gene.value === 1 ? Math.pow(2, bit) : 0);
-            bit+=1;
+            bit += 1;
         });
 
         return resultNum;
     }
 
+
+    //INPUT: a control gene (which is expected to have a populated 'references' array)
+    //OUTPUT: either null, or an array containing the results of the populations
+    /*     resolveReferences(controlGene) {
+            console.log("Resolving one or more references");
+            //First, fail the lookup if there's no references
+            if (!controlGene.references || controlGene.references.length < 1) {
+                return null;
+            }
+            //Next, for each reference that we are given:
+            //1) check if we already have a rendered phenotype property to pull from
+            //2) if not, read the genome to resolve references
+            const resultArray = [];
+    
+    
+            return resultArray;
+        } */
+
     //INPUT: a control gene (which is expected to have a populated 'references' array)
     //OUTPUT: either null (if reference could not be resolved) OR the expect result
     resolveSingleReference(controlGene) {
+        console.log("Resolving a single reference");
         //First, fail the lookup if there's either no references, or too many 
         if (!controlGene.references || controlGene.references.length > 1) {
             return null;
@@ -266,14 +317,26 @@ class Pet {
         //otherwise, we attempt to look up the reference in the control gene sequence
         //and then interpret using THAT control gene :)
         else {
+            //NOTE: in order to be sure that we have a valid reference pair, we need to make sure that the alleles we are looking are not null
             const referencePair = this.dna.controlGenes
-                .filter(genePair =>
-                    genePair[0].controlGeneKeyName === soloSource ||
-                    genePair[1].controlGeneKeyName === soloSource);
+                .filter(genePair => {
+                    let alleleOne = genePair[0];
+                    let alleleTwo = genePair[1];
+                    if (alleleOne !== null && alleleOne.controlGeneKeyName === soloSource) {
+                        return true;
+                    }
+                    else if (alleleTwo !== null && alleleTwo.controlGeneKeyName === soloSource) {
+                        return true;
+                    }
+                    return false;
+                });
 
+            //And if our filter search didn't find anything at all, stop processing
             if (!referencePair || referencePair.length !== 1) {
                 return null;
             }
+
+            //otherwise, we will go ahead and attempt to read the gene sequence!
             const referenceToExpress = this.determineDominance(referencePair[0]);
             return this[referenceToExpress.rnaMethod](referenceToExpress);
         }
@@ -284,16 +347,12 @@ class Pet {
         const secondAllele = gene[1];
         //GENETIC ILLNESS handling!
         //Will have a 50/50 chance of madness here
+        //NOTE: since this is an illness, it feels okay that it may behave randomly
         if (firstAllele === null || secondAllele === null) {
-            if (firstAllele === null && secondAllele.isDominant) {
-                return secondAllele;
-            }
-            else if (secondAllele === null && firstAllele.isDominant) {
-                return firstAllele;
-            }
-            return null;
+            return this.getRandomAllele(gene);
         }
 
+        //Otherwise, we're in the land of traditional mendellian genetics as expected
         //If one is dominant but not the other, return that
         if (firstAllele.isDominant && !secondAllele.isDominant) {
             return firstAllele;
@@ -301,10 +360,8 @@ class Pet {
         if (!firstAllele.isDominant && secondAllele.isDominant) {
             return secondAllele;
         }
-        //(TO-DO) additional special case: codominance!
-        //(TO-DO) figure out how to work this (eventually)
 
-        //otherwise, recessives are returned at random
+        //otherwise, codominant/corecessive genes are returned at random
         return this.getRandomAllele(gene);
     }
 

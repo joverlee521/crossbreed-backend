@@ -103,7 +103,7 @@ app.post('/forgot', function(req, res, next) {
 		var transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {
-				   user: 'kim.tran549@gmail.com',
+				   user: 'kimiboo55@gmail.com',
 				   pass: MY_PASSWORD
 			   }
 		   });

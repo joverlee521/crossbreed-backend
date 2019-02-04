@@ -225,7 +225,7 @@
                     "isDominant": false
                 }
             ],
-            [
+            [ 
                 {
                     "value": 1,
                     "isDominant": false
@@ -237,18 +237,8 @@
             ], 
             [ 
                 {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
                     "value": 0,
                     "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
                 },
                 {
                     "value": 0,
@@ -258,77 +248,7 @@
             [ 
                 {
                     "value": 0,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 0,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
                     "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 0,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
-                    "isDominant": false
-                }
-            ],
-            [  
-                {
-                    "value": 0,
-                    "isDominant": true
-                },
-                {
-                    "value": 1,
-                    "isDominant": false
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
-                    "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
-                },
-                {
-                    "value": 0,
-                    "isDominant": true
-                }
-            ],
-            [ 
-                {
-                    "value": 1,
-                    "isDominant": false
                 },
                 {
                     "value": 0,
@@ -357,8 +277,8 @@
             ],
             [ 
                 {
-                    "value": 1,
-                    "isDominant": false
+                    "value": 0,
+                    "isDominant": true
                 },
                 {
                     "value": 0,
@@ -383,6 +303,86 @@
                 {
                     "value": 1,
                     "isDominant": false
+                }
+            ],
+            [ 
+                {
+                    "value": 1,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": true
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": true
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": true
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
+                }
+            ],
+            [ 
+                {
+                    "value": 0,
+                    "isDominant": false
+                },
+                {
+                    "value": 0,
+                    "isDominant": false
+                }
+            ],
+            [  
+                {
+                    "value": 0,
+                    "isDominant": true
+                },
+                {
+                    "value": 0,
+                    "isDominant": true
                 }
             ],
             [

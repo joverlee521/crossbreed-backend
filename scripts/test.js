@@ -13,6 +13,11 @@ console.log("================WHITE=============")
 readObject(whiteBaby, "dna");
 console.log(whiteBaby.dna.sequence.length);
 
+const newEgg = new Egg(blackPet, whitePet);
+const newChild = new Pet(newEgg);
+console.log("================CHILD================")
+readObject(newChild, "dna");
+
 //recursively read obj data!
 function readObject(obj, exclude = "") {
     for (let key in obj) {

@@ -46,6 +46,18 @@ const petSchema = new mongoose.Schema({
     baseColor: {},
     outlineColor: {},
     gameColor: {},
+    ears: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
+    antennae: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
+    extraGuesses: {
+        type: Number,
+        default: 0
+    },
     parents: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Pet'
@@ -56,11 +68,11 @@ const petSchema = new mongoose.Schema({
     }],
     dna: {
         type: mongoose.Schema.Types.Mixed,
-        validate: {
+ /*        validate: {
             validator: function (val) {
                 return dnaCheck.isValidDNA(val);
             }
-        }
+        } */
     }
 });
 

@@ -42,9 +42,6 @@ module.exports = {
     }
     //(TO-DO) check if we need to do anything to also delete the pets!!
 
-    //Kill the session also!
-
-
     db.User.findByIdAndDelete(loggedInUser)
       .then(result => {
         if (!result) {

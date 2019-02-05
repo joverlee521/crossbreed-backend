@@ -9,7 +9,7 @@ const userSchema = new Schema({
   local: { //if using username/password
 		username: { type: String, unique: true, required: false, sparse: true },
 		password: { type: String, unique: false, required: false },
-		email:{ type: String, unique: true, required: false, sparse: true },
+		email:{ type: String, unique: true, required: false },
 		resetPasswordToken: String,
 		resetPasswordExpires: Date,
   },

@@ -16,8 +16,8 @@ module.exports = {
     console.log("Logged in as " + loggedInUser);
 
     db.User.findById(loggedInUser) //never return any other user info!
-      .populate({path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints' })
-      .populate({path: 'eggs', select: '_id createdOn lifeStage willHatchOn' })
+      .populate({ path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints' })
+      .populate({ path: 'eggs', select: '_id createdOn lifeStage willHatchOn' })
       .then(results => res.json(results))
       .catch(err => res.status(500).json(err));
   },
@@ -61,11 +61,13 @@ module.exports = {
       .catch(err => res.status(500).json(err));
   },
 
-  // Update the specified user's pet list
+  // Update the specified user
   update: async function (req, res) {
+    console.log("Putting user");
     if (!req.session.passport) { //if there is no session info, user is not logged in!  reject their request
       return res.sendStatus(403);
     }
+    console.log("Logged in");
     const loggedInUser = req.session.passport.user._id; //grab the user's id from the session cookie
 
     //sanity check if the id doesn't match the route, also reject with forbidden
@@ -83,12 +85,19 @@ module.exports = {
     const options = { $set: {} };
 
     if (req.body.displayName) {
-      options.$set['displayName'] = req.body.displayName;
+      //check that the new display name would be considered valid first
+      const allowedChars = /^[a-z0-9\ ]+$/i;
+      if (!allowedChars.test(req.body.displayName)) {
+        return res.sendStatus(400); 
+      }
+      else {
+        options.$set['displayName'] = req.body.displayName;
+      }
     }
 
     //finally, update the user, then send the updated user (and their pets) back to the front end
-    const updatedUser = await db.User.findOneAndUpdate({_id: loggedInUser}, options, { new: true, runValidators: true, fields: '_id displayName' });
-    
+    const updatedUser = await db.User.findOneAndUpdate({ _id: loggedInUser }, options, { new: true, runValidators: true, fields: '_id displayName' });
+
     res.json(updatedUser);
 
   }

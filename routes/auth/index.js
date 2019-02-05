@@ -92,15 +92,44 @@ router.post(
 		console.log('======INCOMING NEW USER==========')
 		const { username, password, displayName, email } = req.body
 		console.log("REQ.BODY: ", req.body)
-		// ADD VALIDATION
-		User.findOne({ 'local.username': username }, (err, userMatch) => {
+		
+		//first, always validate anything the user is giving us!!  (That way we can provide the right error messages too ;)
+		const alphanumericNoSpaces = /^[a-z0-9]+$/i;
+		if(!alphanumericNoSpaces.test(username)) {
+			return res.status(400).json({
+				message: 'Sorry, your username can only include letters (a-z) and numbers!'
+			});
+		} 
+
+		const allowedCharsForEmail = /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/
+		if(!allowedCharsForEmail.test(email)) {
+			return res.status(400).json({
+				message: 'Please enter a valid email address (in case you forget your password).'
+			});
+		}
+
+		const alphanumericWithSpaces = /^[a-z0-9\ ]+$/i;
+		if(!alphanumericWithSpaces.test(displayName)) {
+			return res.status(400).json({
+				message: 'Sorry, your display name can only include letters (a-z), spaces, and numbers!'
+			});
+		}
+
+		var strongPassword = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+		if(!strongPassword.test(password)) {
+			return res.status(400).json({
+				message: 'Please select a stronger password.'
+			});
+		}
+
+		User.findOne({ 'local.username': username.toLowerCase() }, (err, userMatch) => {
 			if (userMatch) {
 				return res.status(403).json({
 					message: `Sorry, the username: "${username}" is already taken`
 				})
 			}
 			const newUser = new User({
-				'local.username': username,
+				'local.username': username.toLowerCase(), //NOTE: we'll always convert (and save) the username as lowercase so that it's not annoying for the user on the front end
 				'local.password': password,
 				'local.email':email,
 				displayName
@@ -110,6 +139,7 @@ router.post(
 				next();
 			})
 		})
+		console.log("Going to passport");
 	},
 	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
 )

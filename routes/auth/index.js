@@ -40,33 +40,41 @@ router.post('/logout', (req, res) => {
 router.post('/login/google', (req, res, next) => {
 	console.log("beep" + JSON.stringify(req.body))
 	const { id, givenName } = req.body;
-	User.findOneAndUpdate({ 'google.googleId': id }, { $set: { 'displayName': givenName } }, { upsert: true, new: true }, (err, user) => {
-		
-		console.log("purple mountain"+ user)
-    if (err) return res.json("blue mountain" + err);
-		// return res.json(
-		// 	{
-		// 		_id: user._id,
-		// 		displayName: user.displayName,
-		// 		pets: user.pets,
-		// 		eggs: user.eggs
-		// 	}
-    // )
-    //AP: instead of returning user as above, you would instead do:
-    const userObj = {
-      _id: user._id,
-	  displayName: user.displayName,
-	  pets: user.pets,
-	  eggs: user.eggs
-    }
-    req.login(userObj, function(err) { //AP: req.login is available in passport; it's not an express function
-      if (err) {
-		console.log('Hit some error ', err);
-		return res.status(307)
-      } else {
-        next();
-      }
-    })
+	User.findOne({ 'google.googleId': id })
+	.populate({path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints' })
+    .populate({path: 'eggs', select: '_id createdOn lifeStage willHatchOn' })
+    .then((user) => {
+		if (!user){
+			console.log("no user found");
+			return User.create({ "google.googleId": id , "displayName": givenName}, (err, user) => {
+				console.log(err);
+				console.log(user);
+				req.login(user, function(err) { //AP: req.login is available in passport; it's not an express function
+    			  if (err) {
+					console.log('Hit some error ', err);
+					return res.status(307)
+    			  } else {
+    			    next();
+    			  }
+    			})
+			})
+		}
+    	//AP: instead of returning user as above, you would instead do:
+    	const userObj = {
+    	  _id: user._id,
+		  displayName: user.displayName,
+		  pets: user.pets,
+		  eggs: user.eggs
+    	}
+    	req.login(userObj, function(err) { //AP: req.login is available in passport; it's not an express function
+    	  if (err) {
+			console.log('Hit some error ', err);
+			return res.status(307)
+    	  } else {
+			console.log(user);
+    	    return res.json(user);
+    	  }
+    	})
 		// next(); => AP: Moved next function call above
 
 	})

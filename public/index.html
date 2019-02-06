@@ -5,26 +5,43 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Password Reset Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-    <!-- <script src="main.js"></script> -->
+<style>
+    #formId {
+        position: center;
+    }
+</style>
   </head>
 
   <body>
-    <div class="row">
+<div>
+    <header>
+        <div class="jumbotron">
+            <h1 class="display-3">Your crossbreed password reset</h1>
+            <p class="lead">This link will expire in an hour and your previous password can no longer be used</p>
+            <hr class="my-2">
+            <!-- <p>More info</p> -->
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="Jumbo action link" role="button">More about crossbreed</a>
+            </p>
+        </div>
+    </header>
+    <div class ="container">
       <form id="formId">
+            <label class="active" for="userpasswordreset">New Password</label>
         <input
           id="userpasswordreset"
           type="password"
           class="validate"
+          placeholder=" New Password"
         />
-        <label class="active" for="userpasswordreset">New Password</label>
-        <button type="submit">
+        <small id="emailHelp" class="form-text text-muted">Make sure you write this password down.</small>
+        <button type="submit" class = "btn btn-primary btn-med">
           Submit
         </button>
       </form>
+      </div>
     </div>
 
     <script>

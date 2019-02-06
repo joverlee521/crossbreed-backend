@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const apiRoutes = require("./api");
 const authRoutes = require("./auth");
+const path = require('path')
 
 router.use("/auth", authRoutes);
 router.use("/api", apiRoutes);
@@ -13,10 +14,11 @@ router.use("/api", apiRoutes);
 //   });
 // });
 
-router.get("/", (req, res) => {
-  res.sendFile('public/index.html');
+router.get("/reset/:token", (req, res) => {
+  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 
 });
+
 
 
 // 'https://' + req.headers.host + '/reset/' + token + '\n\n' +
@@ -25,8 +27,10 @@ router.get("/", (req, res) => {
 
 // router.get("/reset/" +  )
 // router.get('/reset/:token', (req, res) => {
+//   console.log(req.body)
 //     res.json({received: req.params.token});
 // });
+
 // app.put("/api/resetpass", (req, res) => {
 //   const { resetPassLink, newPassword } = req.body;
 //   User.hashPassword(newPassword)

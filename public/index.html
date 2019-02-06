@@ -1,22 +1,56 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Password Reset Page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-    <!-- <script src="main.js"></script> -->
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<body>
+    <!-- <script src="main.js"></script> -->
+  </head>
+
+  <body>
     <div class="row">
-        <div class="input-field col s6">
-            <input value="password" id="userpasswordreset" type="password" class="validate">
-            <label class="active" for="userpasswordreset">New Password</label>
-        </div>
+      <form id="formId">
+        <input
+          id="userpasswordreset"
+          type="password"
+          class="validate"
+        />
+        <label class="active" for="userpasswordreset">New Password</label>
+        <button type="submit">
+          Submit
+        </button>
+      </form>
     </div>
-</body>
+
+    <script>
+      $(document).ready(function() {
+        var URL = window.location.href;
+        console.log(URL)
+        var array = URL.split("/");
+        var len = array.length;
+        var token = array[len - 1];
+        console.log(token)
+        $("#formId").submit(function(event) {
+          event.preventDefault();
+
+          var userInput = $("#userpasswordreset")
+            .val()
+            .trim();
+
+          $.ajax({
+            url: "/reset/" + token,
+            method: "POST",
+            data: { "password": userInput },
+            dataType: "json"
+          });
+        });
+        // alert("document is ready");
+      });
+    </script>
+  </body>
 </html>

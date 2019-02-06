@@ -95,7 +95,7 @@ app.post("/forgot", function(req, res, next) {
           if (err) return res.json("blue mountain" + err);
 
           user.local.resetPasswordToken = token;
-          user.local.resetPasswordExpires = Date.now() + 900000; // 1 hour 3600000// 15 mins
+          user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour 3600000// 15 mins
 
           user.save(function(err) {
             done(err, token, user);
@@ -118,7 +118,7 @@ app.post("/forgot", function(req, res, next) {
           text:
             "You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n" +
             "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-            "https://" +
+            "http://" +
             req.headers.host +
             "/reset/" +
             token +
@@ -138,25 +138,6 @@ app.post("/forgot", function(req, res, next) {
   );
 });
 
-// user reset link
-
-app.get("/reset/:token", function(req, res) {
-  User.findOne(
-    {
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() }
-    },
-    function(err, user) {
-      if (!user) {
-        req.flash("error", "Password reset token is invalid or has expired.");
-        return res.redirect("/forgot");
-      }
-      res.render("reset", {
-        user: req.user
-      });
-    }
-  );
-});
 
 
 app.post("/reset/:token", function(req, res) {
@@ -167,12 +148,14 @@ app.post("/reset/:token", function(req, res) {
   async.waterfall(
     [
       function(done) {
+				console.log(req.params.token)
         User.findOne(
           {
             "local.resetPasswordToken": req.params.token,
             "local.resetPasswordExpires": { $gt: Date.now() }
           },
           function(err, user) {
+						console.log("this user needs their password changed" +user)
 						if (err) return res.json("purple mountain" + err);
 
             user.local.password = req.body.password;
@@ -180,16 +163,14 @@ app.post("/reset/:token", function(req, res) {
             user.local.resetPasswordExpires = undefined;
 
             user.save(function(err) {
-              req.logIn(user, function(err) {
-                done(err, user);
-              });
-            });
+							done(err, user);
+						});
           }
         );
       },
       function(user, done) {
-        var smtpTransport = nodemailer.createTransport("SMTP", {
-          service: "SendGrid",
+        var transporter = nodemailer.createTransport({
+          service: "gmail",
           auth: {
             user: "kimiboo55@gmail.com",
             pass: MY_PASSWORD
@@ -205,9 +186,9 @@ app.post("/reset/:token", function(req, res) {
             user.email +
             " has just been changed.\n"
         };
-        smtpTransport.sendMail(mailOptions, function(err) {
-          req.flash("success", "Success! Your password has been changed.");
-          done(err);
+				transporter.sendMail(mailOptions, function(err, info) {
+          if (err) console.log(err);
+          else console.log(info);
         });
       }
     ],

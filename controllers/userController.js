@@ -16,7 +16,7 @@ module.exports = {
     console.log("Logged in as " + loggedInUser);
 
     db.User.findById(loggedInUser) //never return any other user info!
-      .populate({path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints' })
+      .populate({path: 'pets', select: '_id name baseColor outlineColor gameColor level experiencePoints ears antennae extraGuesses' })
       .populate({path: 'eggs', select: '_id createdOn lifeStage willHatchOn' })
       .then(results => res.json(results))
       .catch(err => res.status(500).json(err));

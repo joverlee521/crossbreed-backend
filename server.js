@@ -162,6 +162,7 @@ app.post("/reset/:token", function(req, res) {
           function(err, user) {
 						console.log("this user needs their password changed" +user)
 						if (err) return res.json("purple mountain" + err);
+						if(!user) return res.send("We could not find your account!");
 
             user.local.password = req.body.password;
             user.local.resetPasswordToken = undefined;

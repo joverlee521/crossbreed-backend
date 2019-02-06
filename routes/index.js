@@ -7,12 +7,12 @@ router.use("/auth", authRoutes);
 router.use("/api", apiRoutes);
 
 //healthcheck route
-// router.get("/", (req, res) => {
-//   res.status(200).send({
-//     success: true,
-//     message: "this is a test route"
-//   });
-// });
+router.get("/", (req, res) => {
+  res.status(200).send({
+    success: true,
+    message: "this is a test route"
+  });
+});
 
 router.get("/reset/:token", (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));

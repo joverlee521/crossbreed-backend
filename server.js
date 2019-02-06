@@ -93,7 +93,8 @@ app.post("/forgot", function(req, res, next) {
         User.findOne({ 'local.email': email }, function(err, user) {
 
 					console.log("before blue mountain " +user)
-					if (!user) return res.json("blue mountain" + err);
+					
+					if (!user) return res.status(500).json(err);
 
           user.local.resetPasswordToken = token;
           user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour 3600000// 15 mins
@@ -129,7 +130,10 @@ app.post("/forgot", function(req, res, next) {
 
         transporter.sendMail(mailOptions, function(err, info) {
           if (err) console.log(err);
-          else console.log(info);
+          else {
+						console.log(info);
+						res.sendStatus(200);
+					}
         });
       }
     ],

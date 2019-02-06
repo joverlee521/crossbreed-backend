@@ -88,8 +88,8 @@ app.post('/forgot', function(req, res, next) {
       function(token, done) {
         User.findOne({ 'local.email': email }, function(err, user) {
 
-		console.log("before blue mountain " +user)
-		if (err) return res.json("blue mountain" + err);
+					console.log("before blue mountain " +user)
+					if (!user) return res.json("blue mountain" + err);
 
           user.local.resetPasswordToken = token;
           user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour

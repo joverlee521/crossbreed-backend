@@ -115,6 +115,4 @@ router.post(
 	passport.authenticate('local'), asyncMiddleWare(petController.createStarterPet)
 )
 
-
-
 module.exports = router;
